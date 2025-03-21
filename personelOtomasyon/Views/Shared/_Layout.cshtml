@@ -1,5 +1,22 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+@if (User.IsInRole("Admin"))
+{
+    <li><a asp-controller="Admin" asp-action="Dashboard">Admin Panel</a></li>
+}
+@if (User.IsInRole("Yonetici"))
+{
+    <li><a asp-controller="Yonetici" asp-action="Dashboard">Yönetici Panel</a></li>
+}
+@if (User.IsInRole("Juri"))
+{
+    <li><a asp-controller="Juri" asp-action="GelenBasvurular">Jüri Paneli</a></li>
+}
+@if (User.IsInRole("User"))
+{
+    <li><a asp-controller="Aday" asp-action="Index">İlanlara Göz At</a></li>
+}
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

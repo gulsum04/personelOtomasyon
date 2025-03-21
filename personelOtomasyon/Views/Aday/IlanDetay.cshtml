@@ -1,0 +1,26 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+<h2>@Model.Baslik</h2>
+<p><strong>Kategori:</strong> @Model.Kategori</p>
+<p>@Model.Aciklama</p>
+<p><strong>Başvuru Tarihleri:</strong> @Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</p>
+
+<hr />
+
+<h4>Belge ile Başvuru Yap</h4>
+
+<form asp-action="BasvuruYap" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="ilanId" value="@Model.IlanId" />
+
+    <div class="form-group">
+        <label>Belge Türü</label>
+        <input type="text" name="belgeTuru" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Dosya Seç</label>
+        <input type="file" name="belge" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Başvur</button>
+</form>

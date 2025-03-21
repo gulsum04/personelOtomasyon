@@ -1,0 +1,32 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+<h2>Başvurularım</h2>
+
+@if (!Model.Any())
+{
+    <p>Henüz başvuru yapmadınız.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>İlan Başlığı</th>
+                <th>Kategori</th>
+                <th>Başvuru Tarihi</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var basvuru in Model)
+            {
+                <tr>
+                    <td>@basvuru.Ilan.Baslik</td>
+                    <td>@basvuru.Ilan.Kategori</td>
+                    <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
+                    <td>@basvuru.Durum</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
