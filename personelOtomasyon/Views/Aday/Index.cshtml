@@ -17,7 +17,8 @@ else
                         <h5>@ilan.Baslik (@ilan.Kategori)</h5>
                         <p>@ilan.Aciklama</p>
                         <p><strong>Başvuru:</strong> @ilan.BasvuruBaslangicTarihi.ToShortDateString() - @ilan.BasvuruBitisTarihi.ToShortDateString()</p>
-                        <a class="btn btn-primary" asp-action="IlanDetay" asp-route-id="@ilan.IlanId">Başvuru Yap</a>
+                        <a class="btn btn-primary" asp-action="Basvur" asp-route-id="@ilan.IlanId">Başvuru Yap</a>
+                        <a class="btn btn-primary" asp-action="BasvuruDetay" asp-route-id="@ilan.IlanId">Başvuru Detayı</a>
                     </div>
                 </div>
             </div>

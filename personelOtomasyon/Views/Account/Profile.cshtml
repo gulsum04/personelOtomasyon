@@ -1,0 +1,21 @@
+﻿@model personelOtomasyon.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<h2>Profil Bilgilerim</h2>
+
+<table class="table">
+    <tr>
+        <th>Ad Soyad:</th>
+        <td>@Model.FullName</td>
+    </tr>
+    <tr>
+        <th>TC Kimlik No:</th>
+        <td>@Model.TcKimlikNo</td>
+    </tr>
+    <tr>
+        <th>Email:</th>
+        <td>@Model.Email</td>
+    </tr>
+</table>

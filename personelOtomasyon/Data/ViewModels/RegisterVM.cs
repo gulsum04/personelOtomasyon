@@ -8,9 +8,11 @@ namespace personelOtomasyon.Data.ViewModels
         [Required(ErrorMessage = "Ad Soyad giriniz!")]
         public string FullName { get; set; }
 
-        [Display(Name = "Email")]
-        [Required(ErrorMessage = "Email giriniz!")]
-        public string EmailAddress { get; set; }
+        [Display(Name = "TC Kimlik Numarası")]
+        [Required(ErrorMessage = "TC Kimlik numarası giriniz!")]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "TC Kimlik numarası 11 haneli olmalıdır!")]
+        [RegularExpression(@"^[1-9][0-9]{10}$", ErrorMessage = "Geçerli bir TC Kimlik numarası giriniz!")]
+        public string TcKimlikNo { get; set; }
 
         [Display(Name = "Şifre")]
         [Required(ErrorMessage = "Şifre giriniz!")]

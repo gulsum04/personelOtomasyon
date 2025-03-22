@@ -1,0 +1,12 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+<h2>@Model.Baslik</h2>
+
+<p><strong>Kategori:</strong> @Model.Kategori</p>
+<p><strong>Açıklama:</strong> @Model.Aciklama</p>
+<p><strong>Başvuru Tarihleri:</strong> @Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</p>
+
+<hr />
+
+<a class="btn btn-success" asp-action="Basvur" asp-route-id="@Model.IlanId">Başvuru Yap</a>
+<a class="btn btn-secondary" asp-action="Index">Tüm İlanlara Geri Dön</a>
