@@ -17,10 +17,8 @@ namespace personelOtomasyon.Data
         public DbSet<DegerlendirmeRaporu> DegerlendirmeRaporlari { get; set; }
         public DbSet<JuriUyesi> JuriUyeleri { get; set; }
         public DbSet<KadroKriteri> KadroKriterleri { get; set; }
-        public DbSet<Kullanici> Kullanicilar { get; set; }
-        public DbSet<Rol> Roller { get; set; }
+      
      
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

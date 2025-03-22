@@ -24,7 +24,31 @@ else
                     <td>@basvuru.Ilan.Baslik</td>
                     <td>@basvuru.Ilan.Kategori</td>
                     <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
-                    <td>@basvuru.Durum</td>
+                    <td>
+                        @if (basvuru.Durum == "Beklemede")
+                        {
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-hourglass-split"></i> Beklemede
+                            </span>
+                        }
+                        else if (basvuru.Durum == "Onaylandı")
+                        {
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle-fill"></i> Onaylandı
+                            </span>
+                        }
+                        else if (basvuru.Durum == "Reddedildi")
+                        {
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle-fill"></i> Reddedildi
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-dark">@basvuru.Durum</span>
+                        }
+                    </td>
+
                 </tr>
             }
         </tbody>

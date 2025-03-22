@@ -1,0 +1,42 @@
+﻿@model List<personelOtomasyon.Data.ViewModels.UserWithRoleVM>
+@{
+    ViewData["Title"] = "Kullanıcı Listesi";
+    var allRoles = ViewBag.AllRoles as List<string>;
+}
+
+<h2>Kullanıcılar</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ad Soyad</th>
+            <th>TC Kimlik No</th>
+            <th>Mevcut Rol</th>
+            <th>Yeni Rol Atama</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.TcKimlikNo</td>
+                <td>@user.CurrentRole</td>
+                <td>
+                    <form asp-action="AssignRole" method="post" class="d-flex">
+                        <input type="hidden" name="userId" value="@user.UserId" />
+                        <select name="selectedRole" class="form-select me-2">
+                            @foreach (var role in allRoles)
+                            {
+                                <option value="@role" selected="@(role == user.CurrentRole)">
+                                    @role
+                                </option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-success">Güncelle</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

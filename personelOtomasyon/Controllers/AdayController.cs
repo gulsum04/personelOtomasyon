@@ -19,6 +19,15 @@ namespace personelOtomasyon.Controllers
             _userManager = userManager;
         }
 
+        // Başvuru Detay Sayfası
+        public async Task<IActionResult> BasvuruDetay(int id)
+        {
+            var ilan = await _context.AkademikIlanlar.FirstOrDefaultAsync(i => i.IlanId == id);
+            if (ilan == null) return NotFound();
+
+            return View(ilan);
+        }
+
         // Tüm ilanları listele
         public async Task<IActionResult> Index()
         {
@@ -26,8 +35,8 @@ namespace personelOtomasyon.Controllers
             return View(ilanlar);
         }
 
-        // İlan detay sayfası
-        public async Task<IActionResult> IlanDetay(int id)
+        // Basvur sayfası
+        public async Task<IActionResult> Basvur(int id)
         {
             var ilan = await _context.AkademikIlanlar.FirstOrDefaultAsync(i => i.IlanId == id);
             if (ilan == null) return NotFound();

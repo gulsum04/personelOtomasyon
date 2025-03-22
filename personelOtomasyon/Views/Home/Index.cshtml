@@ -1,8 +1,59 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Akademik Personel Başvuru Sistemi";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2 class="text-center mb-4">Sisteme Giriş</h2>
+
+<div class="container">
+    <div class="row g-4 justify-content-center">
+
+        <!-- Aday -->
+        <div class="col-md-3">
+            <div class="card border-primary h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-lines-fill display-4 text-primary mb-3"></i>
+                    <h5>Aday Girişi</h5>
+                    <a class="btn btn-primary w-100 mt-2"
+                       asp-controller="Account" asp-action="Login" asp-route-role="User">Giriş Yap</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin -->
+        <div class="col-md-3">
+            <div class="card border-danger h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-shield-lock-fill display-4 text-danger mb-3"></i>
+                    <h5>Admin Girişi</h5>
+                    <a class="btn btn-danger w-100 mt-2"
+                       asp-controller="Account" asp-action="Login" asp-route-role="Admin">Giriş Yap</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jüri -->
+        <div class="col-md-3">
+            <div class="card border-warning h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-award-fill display-4 text-warning mb-3"></i>
+                    <h5>Jüri Girişi</h5>
+                    <a class="btn btn-warning w-100 text-white mt-2"
+                       asp-controller="Account" asp-action="Login" asp-route-role="Juri">Giriş Yap</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yönetici -->
+        <div class="col-md-3">
+            <div class="card border-success h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-badge-fill display-4 text-success mb-3"></i>
+                    <h5>Yönetici Girişi</h5>
+                    <a class="btn btn-success w-100 mt-2"
+                       asp-controller="Account" asp-action="Login" asp-route-role="Yonetici">Giriş Yap</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
