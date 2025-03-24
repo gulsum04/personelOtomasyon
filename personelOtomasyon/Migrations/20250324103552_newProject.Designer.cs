@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using personelOtomasyon.Data;
 
@@ -11,9 +12,11 @@ using personelOtomasyon.Data;
 namespace personelOtomasyon.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250324103552_newProject")]
+    partial class newProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,9 +223,6 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("KayitTarihi")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -346,9 +346,8 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("BasvuruId")
                         .HasColumnType("int");
 
-                    b.Property<string>("KullaniciJuriId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciJuriId")
+                        .HasColumnType("int");
 
                     b.Property<string>("RaporDosyasi")
                         .IsRequired()
@@ -359,10 +358,6 @@ namespace personelOtomasyon.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RaporId");
-
-                    b.HasIndex("BasvuruId");
-
-                    b.HasIndex("KullaniciJuriId");
 
                     b.ToTable("DegerlendirmeRaporlari");
                 });
@@ -378,15 +373,10 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("IlanId")
                         .HasColumnType("int");
 
-                    b.Property<string>("KullaniciJuriId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciJuriId")
+                        .HasColumnType("int");
 
                     b.HasKey("JuriUyesiId");
-
-                    b.HasIndex("IlanId");
-
-                    b.HasIndex("KullaniciJuriId");
 
                     b.ToTable("JuriUyeleri");
                 });
@@ -410,17 +400,64 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("KullaniciYoneticiId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciYoneticiId")
+                        .HasColumnType("int");
 
                     b.HasKey("KriterId");
 
-                    b.HasIndex("IlanId");
-
-                    b.HasIndex("KullaniciYoneticiId");
-
                     b.ToTable("KadroKriterleri");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.Kullanici", b =>
+                {
+                    b.Property<int>("KullaniciId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("KullaniciId"));
+
+                    b.Property<string>("AdSoyad")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("KayitTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RolId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SifreHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TcKimlikNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("KullaniciId");
+
+                    b.ToTable("Kullanicilar");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.Rol", b =>
+                {
+                    b.Property<int>("RolId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolId"));
+
+                    b.Property<string>("RolAdi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RolId");
+
+                    b.ToTable("Roller");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -521,63 +558,6 @@ namespace personelOtomasyon.Migrations
                         .IsRequired();
 
                     b.Navigation("Basvuru");
-                });
-
-            modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
-                {
-                    b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
-                        .WithMany()
-                        .HasForeignKey("BasvuruId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
-                        .WithMany()
-                        .HasForeignKey("KullaniciJuriId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Basvuru");
-
-                    b.Navigation("Juri");
-                });
-
-            modelBuilder.Entity("personelOtomasyon.Models.JuriUyesi", b =>
-                {
-                    b.HasOne("personelOtomasyon.Models.AkademikIlan", "Ilan")
-                        .WithMany()
-                        .HasForeignKey("IlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
-                        .WithMany()
-                        .HasForeignKey("KullaniciJuriId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ilan");
-
-                    b.Navigation("Juri");
-                });
-
-            modelBuilder.Entity("personelOtomasyon.Models.KadroKriteri", b =>
-                {
-                    b.HasOne("personelOtomasyon.Models.AkademikIlan", "Ilan")
-                        .WithMany()
-                        .HasForeignKey("IlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Yonetici")
-                        .WithMany()
-                        .HasForeignKey("KullaniciYoneticiId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ilan");
-
-                    b.Navigation("Yonetici");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.AkademikIlan", b =>
