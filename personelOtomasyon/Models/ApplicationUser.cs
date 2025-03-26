@@ -10,9 +10,9 @@ namespace personelOtomasyon.Models
         public string FullName { get; set; }
 
         [Required]
-        public string TcKimlikNo { get; set; } 
+        public string TcKimlikNo { get; set; }
 
-
+        public DateTime KayitTarihi { get; set; }
         public ICollection<Basvuru> Basvurular { get; set; }
         public ICollection<AkademikIlan> Ilanlar { get; set; }
     }
