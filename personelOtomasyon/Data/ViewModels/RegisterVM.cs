@@ -14,6 +14,12 @@ namespace personelOtomasyon.Data.ViewModels
         [RegularExpression(@"^[1-9][0-9]{10}$", ErrorMessage = "Geçerli bir TC Kimlik numarası giriniz!")]
         public string TcKimlikNo { get; set; }
 
+        [Display(Name = "Doğum Yılı")]
+        [Required(ErrorMessage = "Doğum yılı giriniz!")]
+        [Range(1900, 2100, ErrorMessage = "Geçerli bir yıl giriniz!")]
+        public int DogumYili { get; set; }
+
+
         [Display(Name = "Şifre")]
         [Required(ErrorMessage = "Şifre giriniz!")]
         [DataType(DataType.Password)]

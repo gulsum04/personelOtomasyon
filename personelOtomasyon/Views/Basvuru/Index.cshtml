@@ -1,0 +1,57 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+@{
+    ViewData["Title"] = "Başvurular";
+}
+
+<h2 class="mb-4">📂 Tüm Başvurular</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-red">
+        <tr>
+            <th>#</th>
+            <th>İlan Başlığı</th>
+            <th>Kategori</th>
+            <th>Aday</th>
+            <th>Başvuru Tarihi</th>
+            <th>Durum</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var basvuru in Model)
+        {
+            <tr>
+                <td>@basvuru.BasvuruId</td>
+                <td>@basvuru.Ilan?.Baslik</td>
+                <td>@basvuru.Ilan.Kategori</td>
+                <td>@basvuru.Aday?.FullName</td>
+                <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
+
+                <td>
+                    @if (basvuru.Durum == "Beklemede")
+                    {
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-hourglass-split"></i> Beklemede
+                        </span>
+                    }
+                    else if (basvuru.Durum == "Onaylandı")
+                    {
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i> Onaylandı
+                        </span>
+                    }
+                    else if (basvuru.Durum == "Reddedildi")
+                    {
+                        <span class="badge bg-danger">
+                            <i class="bi bi-x-circle-fill"></i> Reddedildi
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-dark">@basvuru.Durum</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,10 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+<h3>Bu ilanı silmek istediğinize emin misiniz?</h3>
+<p><strong>@Model.Baslik</strong> - @Model.Kategori</p>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="IlanId" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

@@ -45,6 +45,19 @@
                                     <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
                                        asp-controller="Admin" asp-action="Dashboard">Admin Panel</a>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                                       asp-controller="Ilan" asp-action="Index">İlanlar</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                                       asp-controller="Ilan" asp-action="Kriter">Kriterler</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                                       asp-controller="Basvuru" asp-action="Index">Başvurular</a>
+                                </li>
                             }
 
                             if (User.IsInRole("Yonetici"))

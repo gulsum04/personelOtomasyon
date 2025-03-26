@@ -1,0 +1,44 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+@{
+    ViewData["Title"] = "Yeni İlan Ekle";
+}
+
+<h2 class="mb-4">📋 Yeni İlan Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Baslik">Başlık</label>
+        <input asp-for="Baslik" class="form-control" />
+        <span asp-validation-for="Baslik" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Kategori">Kategori</label>
+        <input asp-for="Kategori" class="form-control" />
+        <span asp-validation-for="Kategori" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Aciklama">Açıklama</label>
+        <textarea asp-for="Aciklama" class="form-control"></textarea>
+        <span asp-validation-for="Aciklama" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BasvuruBaslangicTarihi">Başvuru Başlangıç Tarihi</label>
+        <input asp-for="BasvuruBaslangicTarihi" type="date" class="form-control" />
+        <span asp-validation-for="BasvuruBaslangicTarihi" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BasvuruBitisTarihi">Başvuru Bitiş Tarihi</label>
+        <input asp-for="BasvuruBitisTarihi" type="date" class="form-control" />
+        <span asp-validation-for="BasvuruBitisTarihi" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
+</form>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using KpsService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -129,8 +130,10 @@ namespace personelOtomasyon.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM registerVM)
         {
-            if (!ModelState.IsValid) return View(registerVM);
+            if (!ModelState.IsValid)
+                return View(registerVM);
 
+            // Aynı TC ile daha önce kayıt yapılmış mı?
             var user = await _context.Users.FirstOrDefaultAsync(u => u.TcKimlikNo == registerVM.TcKimlikNo);
             if (user != null)
             {
@@ -138,6 +141,35 @@ namespace personelOtomasyon.Controllers
                 return View(registerVM);
             }
 
+            // ✅ KPS Web Servisi ile T.C. Kimlik Doğrulama
+            try
+            {
+                var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
+
+                // Ad ve Soyad'ı ayır
+                var ad = registerVM.FullName.Split(" ")[0].ToUpper();
+                var soyad = registerVM.FullName.Split(" ")[^1].ToUpper();
+
+                var kpsResult = await client.TCKimlikNoDogrulaAsync(
+                    long.Parse(registerVM.TcKimlikNo),
+                    ad,
+                    soyad,
+                    registerVM.DogumYili
+                );
+
+                if (!kpsResult.Body.TCKimlikNoDogrulaResult)
+                {
+                    TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
+                    return View(registerVM);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
+                return View(registerVM);
+            }
+
+            // ✅ Kullanıcıyı oluştur
             var newUser = new ApplicationUser
             {
                 FullName = registerVM.FullName,
@@ -145,16 +177,17 @@ namespace personelOtomasyon.Controllers
                 UserName = registerVM.TcKimlikNo,
                 Email = $"{registerVM.TcKimlikNo}@fake.tc",
                 EmailConfirmed = true,
-                KayitTarihi=DateTime.Now
+                KayitTarihi = DateTime.Now
             };
 
             var result = await _userManager.CreateAsync(newUser, registerVM.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(newUser, UserRoles.User); // Default: Aday
+                await _userManager.AddToRoleAsync(newUser, UserRoles.User); // Aday rolü
                 return View("RegisterSuccess");
             }
 
+            // Kayıt başarısızsa hataları göster
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);
@@ -162,6 +195,7 @@ namespace personelOtomasyon.Controllers
 
             return View(registerVM);
         }
+
 
         // ---------- LOGOUT ----------
         [HttpPost]

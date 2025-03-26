@@ -1,0 +1,30 @@
+﻿@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
+
+<h2>📋 İlan Listesi</h2>
+
+<a class="btn btn-success mb-3" asp-action="Create">Yeni İlan Ekle</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Başlık</th>
+            <th>Kategori</th>
+            <th>Başvuru Tarihleri</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ilan in Model)
+        {
+            <tr>
+                <td>@ilan.Baslik</td>
+                <td>@ilan.Kategori</td>
+                <td>@ilan.BasvuruBaslangicTarihi.ToShortDateString() - @ilan.BasvuruBitisTarihi.ToShortDateString()</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@ilan.IlanId">Düzenle</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@ilan.IlanId">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

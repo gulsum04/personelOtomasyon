@@ -56,5 +56,12 @@ namespace personelOtomasyon.Controllers
 
             return RedirectToAction("Users");
         }
+
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
     }
+
+
 }
