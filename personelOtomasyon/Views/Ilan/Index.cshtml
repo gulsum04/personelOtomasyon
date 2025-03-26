@@ -24,6 +24,15 @@
                     <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@ilan.IlanId">Düzenle</a>
                     <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@ilan.IlanId">Sil</a>
                 </td>
+
+                <td>
+                    <a class="btn btn-sm btn-outline-primary"
+                       asp-controller="Admin"
+                       asp-action="IlanaJuriAta"
+                       asp-route-ilanId="@ilan.IlanId">
+                        Jüri Ata
+                    </a>
+                </td>
             </tr>
         }
     </tbody>

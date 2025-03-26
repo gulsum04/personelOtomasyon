@@ -17,6 +17,8 @@ namespace personelOtomasyon.Data
         public DbSet<DegerlendirmeRaporu> DegerlendirmeRaporlari { get; set; }
         public DbSet<JuriUyesi> JuriUyeleri { get; set; }
         public DbSet<KadroKriteri> KadroKriterleri { get; set; }
+        public DbSet<BasvuruJuri> BasvuruJuriAtamalari { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +35,18 @@ namespace personelOtomasyon.Data
                 .HasOne(i => i.Admin)
                 .WithMany()
                 .HasForeignKey(i => i.KullaniciAdminId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BasvuruJuri>()
+                 .HasOne(bj => bj.Basvuru)
+                 .WithMany()
+                 .HasForeignKey(bj => bj.BasvuruId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BasvuruJuri>()
+                .HasOne(bj => bj.Juri)
+                .WithMany()
+                .HasForeignKey(bj => bj.JuriId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

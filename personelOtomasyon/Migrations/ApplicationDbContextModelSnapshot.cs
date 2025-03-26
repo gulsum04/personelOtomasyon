@@ -335,6 +335,30 @@ namespace personelOtomasyon.Migrations
                     b.ToTable("BasvuruBelgeleri");
                 });
 
+            modelBuilder.Entity("personelOtomasyon.Models.BasvuruJuri", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BasvuruId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JuriId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BasvuruId");
+
+                    b.HasIndex("JuriId");
+
+                    b.ToTable("BasvuruJuriAtamalari");
+                });
+
             modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
                 {
                     b.Property<int>("RaporId")
@@ -346,9 +370,8 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("BasvuruId")
                         .HasColumnType("int");
 
-                    b.Property<string>("KullaniciJuriId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciJuriId")
+                        .HasColumnType("int");
 
                     b.Property<string>("RaporDosyasi")
                         .IsRequired()
@@ -359,6 +382,8 @@ namespace personelOtomasyon.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RaporId");
+
+                    b.HasIndex("BasvuruId");
 
                     b.ToTable("DegerlendirmeRaporlari");
                 });
@@ -406,65 +431,12 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("KullaniciYoneticiId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciYoneticiId")
+                        .HasColumnType("int");
 
                     b.HasKey("KriterId");
 
                     b.ToTable("KadroKriterleri");
-                });
-
-            modelBuilder.Entity("personelOtomasyon.Models.Kullanici", b =>
-                {
-                    b.Property<int>("KullaniciId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("KullaniciId"));
-
-                    b.Property<string>("AdSoyad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("KayitTarihi")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("RolId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SifreHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TcKimlikNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("KullaniciId");
-
-                    b.ToTable("Kullanicilar");
-                });
-
-            modelBuilder.Entity("personelOtomasyon.Models.Rol", b =>
-                {
-                    b.Property<int>("RolId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolId"));
-
-                    b.Property<string>("RolAdi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("RolId");
-
-                    b.ToTable("Roller");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -565,6 +537,55 @@ namespace personelOtomasyon.Migrations
                         .IsRequired();
 
                     b.Navigation("Basvuru");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.BasvuruJuri", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
+                        .WithMany()
+                        .HasForeignKey("BasvuruId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
+                        .WithMany()
+                        .HasForeignKey("JuriId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Basvuru");
+
+                    b.Navigation("Juri");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
+                        .WithMany()
+                        .HasForeignKey("BasvuruId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Basvuru");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.JuriUyesi", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.AkademikIlan", "Ilan")
+                        .WithMany()
+                        .HasForeignKey("IlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
+                        .WithMany()
+                        .HasForeignKey("KullaniciJuriId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ilan");
+
+                    b.Navigation("Juri");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.AkademikIlan", b =>

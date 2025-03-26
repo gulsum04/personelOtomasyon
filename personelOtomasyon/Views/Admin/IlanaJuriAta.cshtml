@@ -1,0 +1,37 @@
+﻿@{
+    var ilan = ViewBag.Ilan as personelOtomasyon.Models.AkademikIlan;
+    var juriList = ViewBag.JuriList as List<personelOtomasyon.Models.ApplicationUser>;
+}
+
+<h3>İlan: @ilan.Baslik</h3>
+
+@if (juriList != null && juriList.Any())
+{
+    <form asp-action="IlanaJuriAta" method="post">
+        <input type="hidden" name="ilanId" value="@ilan.IlanId" />
+
+        <div class="mb-3">
+            <label class="form-label">Jüri Seçimi:</label>
+            @foreach (var juri in juriList)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="seciliJuriIdler" value="@juri.Id"
+                           id="juri-@juri.Id" />
+                    <label class="form-check-label" for="juri-@juri.Id">
+                        @juri.FullName (@juri.TcKimlikNo)
+                    </label>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success">Ata</button>
+        <a asp-action="Dashboard" class="btn btn-secondary">Geri</a>
+    </form>
+}
+else
+{
+    <div class="alert alert-info">
+        Bu ilana atanabilecek jüri üyesi kalmadı.
+    </div>
+}

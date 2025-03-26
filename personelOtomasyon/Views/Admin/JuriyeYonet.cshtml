@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Jüri Atama";
+    var basvuru = ViewBag.Basvuru as personelOtomasyon.Models.Basvuru;
+    var juriList = ViewBag.JuriList as List<personelOtomasyon.Models.JuriUyesi>;
+}
+
+<h4>Başvuru Sahibi: @basvuru?.Aday?.FullName</h4>
+<h5>İlan: @basvuru?.Ilan?.Baslik</h5>
+
+<form asp-action="JuriyeYonet" method="post">
+    <input type="hidden" name="basvuruId" value="@basvuru.BasvuruId" />
+
+    @foreach (var juri in juriList)
+    {
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="seciliJuriIdler" value="@juri.KullaniciJuriId" id="juri-@juri.KullaniciJuriId" />
+            <label class="form-check-label" for="juri-@juri.KullaniciJuriId">@juri.Juri.FullName</label>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success mt-3" asp-controller="Basvuru" asp-action="Index">Gönder</button>
+    <a asp-controller="Basvuru" asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
+</form>
