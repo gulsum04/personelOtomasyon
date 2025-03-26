@@ -8,14 +8,8 @@ namespace personelOtomasyon.Models
         [Key]
         public int KriterId { get; set; }
         public int IlanId { get; set; }
-
-        [ForeignKey("IlanId")]
-        public AkademikIlan Ilan;
         public string KriterAdi { get; set; }
-        public string KullaniciYoneticiId { get; set; }
-
-        [ForeignKey("KullaniciYoneticiId")]
-        public ApplicationUser Yonetici {  get; set; }
+        public int KullaniciYoneticiId { get; set; }
         public string Gereklilik { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using personelOtomasyon.Data;
 
@@ -11,9 +12,11 @@ using personelOtomasyon.Data;
 namespace personelOtomasyon.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250324103552_newProject")]
+    partial class newProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,9 +223,6 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("KayitTarihi")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -346,9 +346,8 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("BasvuruId")
                         .HasColumnType("int");
 
-                    b.Property<string>("KullaniciJuriId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciJuriId")
+                        .HasColumnType("int");
 
                     b.Property<string>("RaporDosyasi")
                         .IsRequired()
@@ -374,15 +373,10 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("IlanId")
                         .HasColumnType("int");
 
-                    b.Property<string>("KullaniciJuriId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciJuriId")
+                        .HasColumnType("int");
 
                     b.HasKey("JuriUyesiId");
-
-                    b.HasIndex("IlanId");
-
-                    b.HasIndex("KullaniciJuriId");
 
                     b.ToTable("JuriUyeleri");
                 });
@@ -406,9 +400,8 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("KullaniciYoneticiId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("KullaniciYoneticiId")
+                        .HasColumnType("int");
 
                     b.HasKey("KriterId");
 
