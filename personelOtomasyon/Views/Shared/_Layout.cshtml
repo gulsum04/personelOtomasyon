@@ -11,9 +11,12 @@
     if (User?.Identity != null && User.Identity.IsAuthenticated)
     {
         var currentUser = await UserManager.GetUserAsync(User);
-        fullName = currentUser?.FullName ?? "";
-        okunmamisBildirim = _context.Bildirimler
-            .Count(b => b.KullaniciId == currentUser.Id && !b.OkunduMu);
+        if (currentUser != null)
+        {
+            fullName = currentUser.FullName ?? "";
+            okunmamisBildirim = _context.Bildirimler
+                .Count(b => b.KullaniciId == currentUser.Id && !b.OkunduMu);
+        }
     }
 }
 
