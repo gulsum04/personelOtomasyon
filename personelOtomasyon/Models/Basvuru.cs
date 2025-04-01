@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace personelOtomasyon.Models
@@ -8,7 +8,7 @@ namespace personelOtomasyon.Models
         [Key]
         public int BasvuruId { get; set; }
 
-        public int IlanId { get; set; }
+        public int? IlanId { get; set; }
 
         [ForeignKey("IlanId")]
         public AkademikIlan Ilan { get; set; }
