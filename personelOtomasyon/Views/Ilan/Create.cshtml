@@ -1,4 +1,4 @@
-﻿@model personelOtomasyon.Models.AkademikIlan
+@model personelOtomasyon.Models.AkademikIlan
 
 @{
     ViewData["Title"] = "Yeni İlan Ekle";
@@ -14,12 +14,17 @@
         <input asp-for="Baslik" class="form-control" />
         <span asp-validation-for="Baslik" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="Kategori">Kategori</label>
-        <input asp-for="Kategori" class="form-control" />
+        <select asp-for="Kategori" class="form-control">
+            <option value="">-- Seçiniz --</option>
+            <option>Dr. Öğretim Üyesi</option>
+            <option>Doçent</option>
+            <option>Profesör</option>
+        </select>
         <span asp-validation-for="Kategori" class="text-danger"></span>
     </div>
+
 
     <div class="form-group">
         <label asp-for="Aciklama">Açıklama</label>
