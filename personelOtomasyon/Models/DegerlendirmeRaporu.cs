@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace personelOtomasyon.Models
@@ -7,7 +7,11 @@ namespace personelOtomasyon.Models
     {
         [Key]
         public int RaporId { get; set; }
-        public int KullaniciJuriId { get; set; }
+        public string KullaniciJuriId { get; set; }
+
+        [ForeignKey("KullaniciJuriId")]
+        public ApplicationUser Juri { get; set; }
+
         public int BasvuruId { get; set; }
 
         [ForeignKey("BasvuruId")]
