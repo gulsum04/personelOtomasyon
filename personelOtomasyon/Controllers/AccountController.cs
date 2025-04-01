@@ -195,7 +195,7 @@ namespace personelOtomasyon.Controllers
         }
 
 
-        // ---------- LOGOUT ----------
+        // ---------- LOGOUT ---------
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
