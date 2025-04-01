@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using personelOtomasyon.Models;
 using System.Diagnostics;
@@ -22,22 +22,26 @@ namespace personelOtomasyon.Controllers
             {
                 var user = await _userManager.GetUserAsync(User);
 
-                if (await _userManager.IsInRoleAsync(user, "User"))
-                    return RedirectToAction("Index", "Aday");
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "User"))
+                        return RedirectToAction("Index", "Aday");
 
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
-                    return RedirectToAction("Dashboard", "Admin");
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                        return RedirectToAction("Dashboard", "Admin");
 
-                if (await _userManager.IsInRoleAsync(user, "Yonetici"))
-                    return RedirectToAction("Dashboard", "Yonetici");
+                    if (await _userManager.IsInRoleAsync(user, "Yonetici"))
+                        return RedirectToAction("Dashboard", "Yonetici");
 
-                if (await _userManager.IsInRoleAsync(user, "Juri"))
-                    return RedirectToAction("GelenBasvurular", "Juri");
+                    if (await _userManager.IsInRoleAsync(user, "Juri"))
+                        return RedirectToAction("GelenBasvurular", "Juri");
+                }
             }
 
             // Giriş yapılmamışsa ana sayfa gösterilir
             return View();
         }
+
 
         public IActionResult Privacy()
         {
