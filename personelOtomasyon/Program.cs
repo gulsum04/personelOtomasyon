@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
 using Microsoft.AspNetCore.Identity;
 using personelOtomasyon.Models;
