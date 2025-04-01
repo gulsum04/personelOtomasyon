@@ -1,7 +1,9 @@
-﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+@model IEnumerable<personelOtomasyon.Models.Basvuru>
 
 @{
     ViewData["Title"] = "Başvurular";
+    // ❗ ViewBag null olabilir, bu yüzden güvenli hale getiriyoruz:
+    var juriDurumlari = ViewBag.JuriAtamaDurumlari as Dictionary<int, bool> ?? new Dictionary<int, bool>();
 }
 
 <h2 class="mb-4">📂 Tüm Başvurular</h2>
@@ -15,6 +17,8 @@
             <th>Aday</th>
             <th>Başvuru Tarihi</th>
             <th>Durum</th>
+            <th>Jüri Durumu</th>
+            <th>İşlemler</th>
         </tr>
     </thead>
     <tbody>
@@ -23,39 +27,56 @@
             <tr>
                 <td>@basvuru.BasvuruId</td>
                 <td>@basvuru.Ilan?.Baslik</td>
-                <td>@basvuru.Ilan.Kategori</td>
+                <td>@basvuru.Ilan?.Kategori</td>
                 <td>@basvuru.Aday?.FullName</td>
                 <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
 
                 <td>
-                    @if (basvuru.Durum == "Beklemede")
+                    @switch (basvuru.Durum)
                     {
-                        <span class="badge bg-secondary">
-                            <i class="bi bi-hourglass-split"></i> Beklemede
-                        </span>
+                        case "Onaylandı":
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle-fill"></i> Onaylandı
+                            </span>
+                            break;
+                        case "Reddedildi":
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle-fill"></i> Reddedildi
+                            </span>
+                            break;
+                        default:
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-hourglass-split"></i> Beklemede
+                            </span>
+                            break;
                     }
-                    else if (basvuru.Durum == "Onaylandı")
+                </td>
+
+                <!-- 🔍 Jüri Durumu -->
+                <td>
+                    @if (juriDurumlari.TryGetValue(basvuru.BasvuruId, out var juriAtandi) && juriAtandi)
                     {
-                        <span class="badge bg-success">
-                            <i class="bi bi-check-circle-fill"></i> Onaylandı
-                        </span>
-                    }
-                    else if (basvuru.Durum == "Reddedildi")
-                    {
-                        <span class="badge bg-danger">
-                            <i class="bi bi-x-circle-fill"></i> Reddedildi
+                        <span class="badge bg-info text-dark">
+                            <i class="bi bi-people-fill"></i> Jüri Atandı
                         </span>
                     }
                     else
                     {
-                        <span class="badge bg-dark">@basvuru.Durum</span>
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-person-dash"></i> Jüri Atanmadı
+                        </span>
                     }
-                    <a class="btn btn-sm btn-warning" asp-controller="Admin" asp-action="JuriyeYonet" asp-route-basvuruId="@basvuru.BasvuruId">
-                        Jüri Ata
-                    </a>
-
                 </td>
 
+                <!-- 🔧 İşlemler -->
+                <td>
+                    <a class="btn btn-sm btn-warning"
+                       asp-controller="Admin"
+                       asp-action="JuriyeYonet"
+                       asp-route-basvuruId="@basvuru.BasvuruId">
+                        Jüri Ata
+                    </a>
+                </td>
             </tr>
         }
     </tbody>
