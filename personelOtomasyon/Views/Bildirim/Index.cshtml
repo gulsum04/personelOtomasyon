@@ -1,0 +1,39 @@
+﻿@model List<personelOtomasyon.Models.Bildirim>
+
+@{
+    ViewData["Title"] = "Bildirimler";
+}
+
+<h2 class="mb-4">🔔 Bildirimler</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Hiç bildiriminiz yok.</div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var bildirim in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center @(bildirim.OkunduMu ? "" : "list-group-item-warning")">
+                <div>
+                    <strong>@bildirim.Mesaj</strong><br />
+                    <small class="text-muted">@bildirim.Tarih.ToString("g")</small>
+                </div>
+                <div class="btn-group">
+                    @if (!bildirim.OkunduMu)
+                    {
+                        <form method="post" asp-action="OkunduYap" class="me-2">
+                            <input type="hidden" name="id" value="@bildirim.BildirimId" />
+                            <button class="btn btn-sm btn-success">Okundu</button>
+                        </form>
+                    }
+                    <form method="post" asp-action="Sil">
+                        <input type="hidden" name="id" value="@bildirim.BildirimId" />
+                        <button class="btn btn-sm btn-danger">Sil</button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+}
