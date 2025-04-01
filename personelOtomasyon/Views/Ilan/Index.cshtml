@@ -1,16 +1,20 @@
-﻿@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
+@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
 
-<h2>📋 İlan Listesi</h2>
+@{
+    ViewData["Title"] = "İlan Listesi";
+}
 
-<a class="btn btn-success mb-3" asp-action="Create">Yeni İlan Ekle</a>
+<h2 class="mb-4">📋 İlan Listesi</h2>
 
-<table class="table table-bordered">
-    <thead>
+<a class="btn btn-success mb-3" asp-action="Create">➕ Yeni İlan Ekle</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
         <tr>
             <th>Başlık</th>
             <th>Kategori</th>
             <th>Başvuru Tarihleri</th>
-            <th>İşlemler</th>
+            <th style="width: 220px;">İşlemler</th>
         </tr>
     </thead>
     <tbody>
@@ -19,19 +23,31 @@
             <tr>
                 <td>@ilan.Baslik</td>
                 <td>@ilan.Kategori</td>
-                <td>@ilan.BasvuruBaslangicTarihi.ToShortDateString() - @ilan.BasvuruBitisTarihi.ToShortDateString()</td>
                 <td>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@ilan.IlanId">Düzenle</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@ilan.IlanId">Sil</a>
+                    @ilan.BasvuruBaslangicTarihi.ToShortDateString() -
+                    @ilan.BasvuruBitisTarihi.ToShortDateString()
                 </td>
-
                 <td>
-                    <a class="btn btn-sm btn-outline-primary"
-                       asp-controller="Admin"
-                       asp-action="IlanaJuriAta"
-                       asp-route-ilanId="@ilan.IlanId">
-                        Jüri Ata
-                    </a>
+                    <div class="d-flex flex-wrap gap-1">
+                        <a class="btn btn-sm btn-warning"
+                           asp-action="Edit"
+                           asp-route-id="@ilan.IlanId">
+                            Düzenle
+                        </a>
+
+                        <a class="btn btn-sm btn-danger"
+                           asp-action="Delete"
+                           asp-route-id="@ilan.IlanId">
+                             Sil
+                        </a>
+
+                        <a class="btn btn-sm btn-outline-primary"
+                           asp-controller="Admin"
+                           asp-action="IlanaJuriAta"
+                           asp-route-ilanId="@ilan.IlanId">
+                           Jüri Ata
+                        </a>
+                    </div>
                 </td>
             </tr>
         }
