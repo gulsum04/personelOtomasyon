@@ -1,4 +1,4 @@
-﻿using KpsService;
+using KpsService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -95,7 +95,6 @@ namespace personelOtomasyon.Controllers
                 return View(loginVM);
             }
 
-            // ❗ Rol kontrolü
             var isInRole = await _userManager.IsInRoleAsync(user, loginVM.RequestedRole);
             if (!isInRole)
             {
@@ -110,7 +109,6 @@ namespace personelOtomasyon.Controllers
                 return View(loginVM);
             }
 
-            // Giriş başarılıysa yönlendir
             if (loginVM.RequestedRole == UserRoles.Admin)
                 return RedirectToAction("Dashboard", "Admin");
 
@@ -118,7 +116,7 @@ namespace personelOtomasyon.Controllers
                 return RedirectToAction("Dashboard", "Yonetici");
 
             if (loginVM.RequestedRole == UserRoles.Juri)
-                return RedirectToAction("GelenBasvurular", "Juri");
+                return RedirectToAction("Index", "Juri"); // ⚠️ doğru yönlendirme burası
 
             return RedirectToAction("Index", "Aday"); // Default: Aday
         }
@@ -142,7 +140,7 @@ namespace personelOtomasyon.Controllers
             }
 
             // ✅ KPS Web Servisi ile T.C. Kimlik Doğrulama
-            try
+            /*try
             {
                 var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
 
@@ -167,7 +165,7 @@ namespace personelOtomasyon.Controllers
             {
                 TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
                 return View(registerVM);
-            }
+            }*/
 
             // ✅ Kullanıcıyı oluştur
             var newUser = new ApplicationUser
