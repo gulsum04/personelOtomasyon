@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
@@ -19,19 +19,20 @@ namespace personelOtomasyon.Controllers
             _userManager = userManager;
         }
 
-        // Listele
+        // İlanları Listele
         public async Task<IActionResult> Index()
         {
             var ilanlar = await _context.AkademikIlanlar.ToListAsync();
             return View(ilanlar);
         }
 
-        // Yeni ilan formu
+        // Yeni İlan Formu (GET)
         public IActionResult Create()
         {
             return View();
         }
 
+        // Yeni İlan Ekle (POST)
         [HttpPost]
         public async Task<IActionResult> Create(AkademikIlan ilan)
         {
@@ -54,7 +55,26 @@ namespace personelOtomasyon.Controllers
             {
                 _context.Add(ilan);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "İlan başarıyla eklendi.";
+
+                // 🔔 Aday ve jüriye bildirim gönder
+                var hedefRoller = new[] { "User", "Juri" };
+                foreach (var rol in hedefRoller)
+                {
+                    var users = await _userManager.GetUsersInRoleAsync(rol);
+                    foreach (var user in users)
+                    {
+                        _context.Bildirimler.Add(new Bildirim
+                        {
+                            KullaniciId = user.Id,
+                            Mesaj = $"Yeni bir ilan yayınlandı: {ilan.Baslik}",
+                            OkunduMu = false
+                        });
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "İlan başarıyla eklendi ve bildirim gönderildi.";
                 return RedirectToAction("Index");
             }
             catch
@@ -72,6 +92,7 @@ namespace personelOtomasyon.Controllers
             return View(ilan);
         }
 
+        // Güncelle (POST)
         [HttpPost]
         public async Task<IActionResult> Edit(int id, AkademikIlan ilan)
         {
@@ -79,7 +100,6 @@ namespace personelOtomasyon.Controllers
             if (!ModelState.IsValid) return View(ilan);
 
             ilan.KullaniciAdminId = _userManager.GetUserId(User);
-
             _context.Update(ilan);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -93,13 +113,34 @@ namespace personelOtomasyon.Controllers
             return View(ilan);
         }
 
+        // Sil (POST)
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var ilan = await _context.AkademikIlanlar.FindAsync(id);
-            _context.AkademikIlanlar.Remove(ilan);
-            await _context.SaveChangesAsync();
+            var ilan = await _context.AkademikIlanlar
+                .Include(i => i.Basvurular) // Bu satır ilişkili veriler için gerekli olabilir (eğer tanımlandıysa)
+                .FirstOrDefaultAsync(i => i.IlanId == id);
+
+            if (ilan == null)
+            {
+                TempData["Error"] = "İlan bulunamadı.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                _context.AkademikIlanlar.Remove(ilan);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "İlan ve ilgili başvurular başarıyla silindi.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Silme işlemi sırasında bir hata oluştu.";
+            }
+
             return RedirectToAction("Index");
         }
+
     }
 }
