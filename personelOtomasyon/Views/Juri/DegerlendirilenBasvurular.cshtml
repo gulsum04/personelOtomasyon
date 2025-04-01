@@ -1,0 +1,37 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+<h3>✅ Değerlendirilen Başvurular</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Aday</th>
+            <th>İlan</th>
+            <th>Başvuru Tarihi</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.KullaniciAdayId</td>
+                <td>@item.Aday.FullName</td>
+                <td>@item.Ilan.Baslik</td>
+                <td>@item.BasvuruTarihi.ToShortDateString()</td>
+                <td>
+                    <a class="btn btn-warning btn-sm"
+                       asp-action="DegerlendirmeGuncelle"
+                       asp-route-id="@item.BasvuruId">
+                        Güncelle
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>

@@ -1,0 +1,24 @@
+﻿@model personelOtomasyon.Models.DegerlendirmeRaporu
+
+<h3>📝 Değerlendirme Güncelle</h3>
+
+<form method="post">
+    <input type="hidden" asp-for="RaporId" />
+    <input type="hidden" asp-for="BasvuruId" />
+
+    <div class="form-group mb-3">
+        <label>Sonuç</label>
+        <select asp-for="Sonuc" class="form-control">
+            <option value="Olumlu">Olumlu</option>
+            <option value="Olumsuz">Olumsuz</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Rapor Metni</label>
+        <textarea asp-for="RaporDosyasi" class="form-control" rows="4"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a asp-action="DegerlendirilenBasvurular" class="btn btn-secondary ms-2">Geri</a>
+</form>

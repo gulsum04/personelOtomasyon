@@ -1,0 +1,19 @@
+﻿@model personelOtomasyon.Models.Basvuru
+
+<h3>📌 Başvuru Detayı</h3>
+
+<p><b>Aday:</b> @Model.KullaniciAdayId</p>
+<p><b>İlan Başlığı:</b> @Model.Ilan.Baslik</p>
+
+<h4>Yüklenen Belgeler:</h4>
+<ul>
+    @foreach (var belge in Model.Belgeler)
+    {
+        <li><a href="@belge.DosyaYolu" target="_blank">@belge.BelgeTuru</a></li>
+    }
+    
+
+</ul>
+
+<a class="btn btn-success me-2" asp-action="Degerlendir" asp-route-id="@Model.BasvuruId">Değerlendir</a>
+<a asp-action="GelenBasvurular" class="btn btn-secondary mt-3">Geri</a>
