@@ -2,7 +2,7 @@
 
 <h2>@Model.Baslik</h2>
 <p><strong>Kategori:</strong> @Model.Kategori</p>
-<p>@Model.Aciklama</p>
+<p><strong>Açıklama:</strong>@Model.Aciklama</p>
 <p><strong>Başvuru Tarihleri:</strong> @Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</p>
 
 <hr />
@@ -13,7 +13,7 @@
     <input type="hidden" name="ilanId" value="@Model.IlanId" />
 
     <div class="form-group">
-        <label>Belge Türü</label>
+        <label>Belge Adı</label>
         <input type="text" name="belgeTuru" class="form-control" required />
     </div>
 

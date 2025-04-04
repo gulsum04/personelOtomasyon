@@ -57,13 +57,13 @@
                     @if (juriDurumlari.TryGetValue(basvuru.BasvuruId, out var juriAtandi) && juriAtandi)
                     {
                         <span class="badge bg-info text-dark">
-                            <i class="bi bi-people-fill"></i> Jüri Atandı
+                            <i class="bi bi-people-fill"></i> Jüriye Yönlendirildi
                         </span>
                     }
                     else
                     {
                         <span class="badge bg-warning text-dark">
-                            <i class="bi bi-person-dash"></i> Jüri Atanmadı
+                            <i class="bi bi-person-dash"></i> Jüriye Yönlendirilmedi
                         </span>
                     }
                 </td>
@@ -74,7 +74,7 @@
                        asp-controller="Admin"
                        asp-action="JuriyeYonet"
                        asp-route-basvuruId="@basvuru.BasvuruId">
-                        Jüri Ata
+                        Jüriye Yönlendir
                     </a>
                 </td>
             </tr>
