@@ -41,9 +41,17 @@ namespace personelOtomasyon.Controllers
             var ilan = await _context.AkademikIlanlar.FirstOrDefaultAsync(i => i.IlanId == id);
             if (ilan == null) return NotFound();
 
+            var user = await _userManager.GetUserAsync(User);
+            var dahaOnceBasvurmusMu = await _context.Basvurular.AnyAsync(b => b.IlanId == id && b.KullaniciAdayId == user.Id);
+
+            if (dahaOnceBasvurmusMu)
+            {
+                TempData["Uyari"] = "❗ Bu ilana zaten başvurdunuz.";
+                return RedirectToAction("Index");
+            }
+
             return View(ilan);
         }
-
         // Başvuru işlemi
         [HttpPost]
         public async Task<IActionResult> BasvuruYap(int ilanId, string belgeTuru, IFormFile belge)

@@ -1,24 +1,42 @@
-﻿@model personelOtomasyon.Models.DegerlendirmeRaporu
+﻿@model personelOtomasyon.Data.ViewModels.DegerlendirmeRaporuVM
 
-<h3>📝 Değerlendirme Güncelle</h3>
+@if (TempData["Sonuc"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Sonuc"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    </div>
+}
+<form asp-controller="Juri" asp-action="DegerlendirmeGuncelle" method="post">
+    @Html.AntiForgeryToken()
 
-<form method="post">
     <input type="hidden" asp-for="RaporId" />
     <input type="hidden" asp-for="BasvuruId" />
 
-    <div class="form-group mb-3">
-        <label>Sonuç</label>
+    <div class="form-group">
+           @if (TempData["Uyari"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Uyari"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    </div>
+}
+
+        <label asp-for="Sonuc">Sonuç</label>
         <select asp-for="Sonuc" class="form-control">
+            <option value="">Seçiniz</option>
             <option value="Olumlu">Olumlu</option>
             <option value="Olumsuz">Olumsuz</option>
         </select>
+        <span asp-validation-for="Sonuc" class="text-danger"></span>
     </div>
 
-    <div class="form-group mb-3">
-        <label>Rapor Metni</label>
-        <textarea asp-for="RaporDosyasi" class="form-control" rows="4"></textarea>
+    <div class="form-group">
+        <label asp-for="RaporDosyasi">Rapor Dosyası</label>
+        <textarea asp-for="RaporDosyasi" class="form-control"></textarea>
+        <span asp-validation-for="RaporDosyasi" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Güncelle</button>
-    <a asp-action="DegerlendirilenBasvurular" class="btn btn-secondary ms-2">Geri</a>
 </form>
+

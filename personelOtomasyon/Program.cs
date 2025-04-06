@@ -19,23 +19,10 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-//  ROL EKLEME BLOĞU (Admin ve User rolleri oluşturulur)
+// Seed verileri çağır (roller, admin, jüri, aday, ilan vs.)
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    Task.Run(async () =>
-    {
-        string[] roleNames = { "Admin", "User", "Yonetici", "Juri" };
-
-        foreach (var role in roleNames)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
-    }).GetAwaiter().GetResult();
+    await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
 // Hata yönetimi
@@ -57,45 +44,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
-
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-    string[] roles = { "Admin", "Aday", "Yönetici", "Jüri" };
-
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-
-    // Admin kullanıcıyı oluştur
-    string adminTc = "66666666666";
-    string adminEmail = "admin@kou.edu.tr";
-    string adminPassword = "Admin123!";
-
-    var adminUser = await userManager.FindByNameAsync(adminTc);
-    if (adminUser == null)
-    {
-        var newAdmin = new ApplicationUser
-        {
-            FullName = "Sistem Yöneticisi",
-            TcKimlikNo = adminTc,
-            UserName = adminTc,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(newAdmin, adminPassword);
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(newAdmin, "Admin");
-        }
-    }
-}
 
 app.Run();

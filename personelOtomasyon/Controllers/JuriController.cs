@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
+using personelOtomasyon.Data.ViewModels;
 using personelOtomasyon.Models;
 
 namespace personelOtomasyon.Controllers
 {
     [Authorize(Roles = "Juri")]
+    [Route("Juri")]
     public class JuriController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,17 +21,13 @@ namespace personelOtomasyon.Controllers
             _userManager = userManager;
         }
 
-        // 🎓 Jüri Ana Paneli
-        public IActionResult Index()
-        {
-            return View();
-        }
+        [HttpGet("")]
+        public IActionResult Index() => View();
 
-        // 📥 Gelen Başvurular (Sadece jüriye atanmış ve henüz değerlendirilmemiş başvurular)
+        [HttpGet("GelenBasvurular")]
         public IActionResult GelenBasvurular()
         {
             var userId = _userManager.GetUserId(User);
-
             var basvuruIdler = _context.BasvuruJuriAtamalari
                 .Where(j => j.JuriId == userId)
                 .Select(j => j.BasvuruId)
@@ -47,11 +45,10 @@ namespace personelOtomasyon.Controllers
             return View(basvurular);
         }
 
-        // ✅ Daha Önce Değerlendirilmiş Başvurular
+        [HttpGet("DegerlendirilenBasvurular")]
         public IActionResult DegerlendirilenBasvurular()
         {
             var userId = _userManager.GetUserId(User);
-
             var basvurular = _context.DegerlendirmeRaporlari
                 .Include(r => r.Basvuru)
                     .ThenInclude(b => b.Ilan)
@@ -65,14 +62,12 @@ namespace personelOtomasyon.Controllers
             return View(basvurular);
         }
 
-        // 📌 Detay Sayfası (Sadece yetkili jüri erişebilir)
-        public IActionResult BasvuruDetay(int id)
+        [HttpGet("BasvuruDetay/{id}")]
+        public IActionResult BasvuruDetay(int id, string kaynak = "")
         {
             var userId = _userManager.GetUserId(User);
             var yetkiliMi = _context.BasvuruJuriAtamalari.Any(j => j.BasvuruId == id && j.JuriId == userId);
-
-            if (!yetkiliMi)
-                return Forbid();
+            if (!yetkiliMi) return Forbid();
 
             var basvuru = _context.Basvurular
                 .Include(b => b.Belgeler)
@@ -80,75 +75,94 @@ namespace personelOtomasyon.Controllers
                 .Include(b => b.Aday)
                 .FirstOrDefault(b => b.BasvuruId == id);
 
-            if (basvuru == null)
-                return NotFound();
+            if (basvuru == null) return NotFound();
+
+            // İlgili jüriye ait değerlendirme raporunu çek
+            var rapor = _context.DegerlendirmeRaporlari
+                .FirstOrDefault(r => r.BasvuruId == id && r.KullaniciJuriId == userId);
+
+            ViewBag.Kaynak = kaynak;
+            ViewBag.Rapor = rapor;
 
             return View(basvuru);
         }
-
-        // 📝 Değerlendirme Formu (GET)
-        [HttpGet]
+        [HttpGet("Degerlendir/{id}")]
         public IActionResult Degerlendir(int id)
         {
             var userId = _userManager.GetUserId(User);
-
             var yetkiliMi = _context.BasvuruJuriAtamalari.Any(j => j.BasvuruId == id && j.JuriId == userId);
-            if (!yetkiliMi)
-                return Forbid();
+            if (!yetkiliMi) return Forbid();
 
-            var dahaOnceDegerlendirilmisMi = _context.DegerlendirmeRaporlari.Any(r => r.BasvuruId == id && r.KullaniciJuriId == userId);
+            var dahaOnceDegerlendirilmisMi = _context.DegerlendirmeRaporlari
+                .Any(r => r.BasvuruId == id && r.KullaniciJuriId == userId);
             if (dahaOnceDegerlendirilmisMi)
             {
-                TempData["Uyari"] = "Bu başvuru zaten değerlendirildi. Güncellemek için 'Değerlendirilen Başvurular' sayfasına gidin.";
+                TempData["Uyari"] = "Bu başvuru zaten değerlendirildi.";
                 return RedirectToAction("DegerlendirilenBasvurular");
             }
 
-            var rapor = new DegerlendirmeRaporu { BasvuruId = id };
-            return View(rapor);
+            return View(new DegerlendirmeRaporuVM { BasvuruId = id });
         }
 
-        // 📨 Değerlendirme Gönderme (POST)
-        [HttpPost]
-        public IActionResult Degerlendir(DegerlendirmeRaporu rapor)
+        [HttpPost("Degerlendir")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DegerlendirPost(DegerlendirmeRaporuVM model)
         {
             var userId = _userManager.GetUserId(User);
 
-            var yetkiliMi = _context.BasvuruJuriAtamalari.Any(j => j.BasvuruId == rapor.BasvuruId && j.JuriId == userId);
-            if (!yetkiliMi)
-                return Forbid();
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                rapor.KullaniciJuriId = userId;
-                rapor.RaporDosyasi = ""; // Dosya özelliği eklenecekse burada set edilir
-                _context.DegerlendirmeRaporlari.Add(rapor);
-                _context.SaveChanges();
-
-                return RedirectToAction("GelenBasvurular");
+                TempData["Sonuc"] = "Formda eksik alanlar var.";
+                return View("Degerlendir", model);
             }
 
-            return View(rapor);
+            var yetkiliMi = _context.BasvuruJuriAtamalari
+                .Any(j => j.BasvuruId == model.BasvuruId && j.JuriId == userId);
+            if (!yetkiliMi) return Forbid();
+
+            var yeniRapor = new DegerlendirmeRaporu
+            {
+                BasvuruId = model.BasvuruId,
+                RaporDosyasi = model.RaporDosyasi,
+                Sonuc = model.Sonuc,
+                KullaniciJuriId = userId
+            };
+
+            _context.DegerlendirmeRaporlari.Add(yeniRapor);
+            _context.SaveChanges();
+
+            return RedirectToAction("GelenBasvurular");
         }
 
-        // 🛠️ Değerlendirme Güncelle (GET)
-        [HttpGet]
+        [HttpGet("DegerlendirmeGuncelle")]
         public IActionResult DegerlendirmeGuncelle(int id)
         {
             var userId = _userManager.GetUserId(User);
             var rapor = _context.DegerlendirmeRaporlari
-                .FirstOrDefault(r => r.BasvuruId == id && r.KullaniciJuriId == userId);
+                .FirstOrDefault(r => r.RaporId == id && r.KullaniciJuriId == userId);
 
-            if (rapor == null)
-                return Forbid();
+            if (rapor == null) return Forbid();
 
-            return View(rapor);
+            return View(new DegerlendirmeRaporuVM
+            {
+                RaporId = rapor.RaporId,
+                BasvuruId = rapor.BasvuruId,
+                Sonuc = rapor.Sonuc,
+                RaporDosyasi = rapor.RaporDosyasi
+            });
         }
 
-        // 🔄 Güncellenmiş Değerlendirmeyi Kaydet (POST)
         [HttpPost]
-        public IActionResult DegerlendirmeGuncelle(DegerlendirmeRaporu guncelRapor)
+        [ValidateAntiForgeryToken]
+        [Route("DegerlendirmeGuncelle")]
+        public IActionResult DegerlendirmeGuncelle(DegerlendirmeRaporuVM guncelRapor)
         {
             var userId = _userManager.GetUserId(User);
+
+            if (!ModelState.IsValid)
+            {
+                return View(guncelRapor);
+            }
 
             var mevcutRapor = _context.DegerlendirmeRaporlari
                 .FirstOrDefault(r => r.RaporId == guncelRapor.RaporId && r.KullaniciJuriId == userId);
@@ -156,14 +170,19 @@ namespace personelOtomasyon.Controllers
             if (mevcutRapor == null)
                 return Forbid();
 
-            if (!ModelState.IsValid)
+            // 🔍 Değişiklik kontrolü
+            if (mevcutRapor.Sonuc == guncelRapor.Sonuc && mevcutRapor.RaporDosyasi == guncelRapor.RaporDosyasi)
+            {
+                TempData["Uyari"] = "❗ Herhangi bir değişiklik yapılmadı.";
                 return View(guncelRapor);
+            }
 
+            // Güncelleme işlemi
             mevcutRapor.Sonuc = guncelRapor.Sonuc;
             mevcutRapor.RaporDosyasi = guncelRapor.RaporDosyasi;
-
             _context.SaveChanges();
 
+            TempData["GuncellemeMesaji"] = "✔ Değerlendirme başarıyla güncellendi.";
             return RedirectToAction("DegerlendirilenBasvurular");
         }
     }
