@@ -6,20 +6,38 @@
 
 <h2 class="mb-4">📝 İlanı Düzenle</h2>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="IlanId" />
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group">
         <label asp-for="Baslik">Başlık</label>
         <input asp-for="Baslik" class="form-control" />
         <span asp-validation-for="Baslik" class="text-danger"></span>
     </div>
-
     <div class="form-group">
         <label asp-for="Kategori">Kategori</label>
-        <input asp-for="Kategori" class="form-control" />
+        <select asp-for="Kategori" class="form-control">
+            <option value="">-- Seçiniz --</option>
+            <option>Dr. Öğretim Üyesi</option>
+            <option>Doçent</option>
+            <option>Profesör</option>
+        </select>
         <span asp-validation-for="Kategori" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="TemelAlan">Temel Alan</label>
+        <select asp-for="TemelAlan" class="form-control">
+            <option value="">-- Seçiniz --</option>
+            <option>Sağlık Bilimleri</option>
+            <option>Fen Bilimleri</option>
+            <option>Matematik</option>
+            <option>Mühendislik</option>
+            <option>Ziraat</option>
+            <option>Orman ve Su Ürünleri</option>
+        </select>
+        <span asp-validation-for="TemelAlan" class="text-danger"></span>
+    </div>
+
 
     <div class="form-group">
         <label asp-for="Aciklama">Açıklama</label>
@@ -39,6 +57,6 @@
         <span asp-validation-for="BasvuruBitisTarihi" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Güncelle</button>
+    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
     <a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
 </form>

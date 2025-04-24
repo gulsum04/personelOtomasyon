@@ -1,0 +1,45 @@
+﻿@model personelOtomasyon.Data.ViewModels.DegerlendirmeRaporuVM
+
+<h3>📝 Başvuru Değerlendirme</h3>
+
+<!-- Tüm model hatalarını üstte göster -->
+@Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+<form method="post" asp-action="DegerlendirPost" asp-controller="Juri">
+    @Html.AntiForgeryToken()
+
+    <!-- Gizli Başvuru ID -->
+    <input type="hidden" asp-for="BasvuruId" />
+
+    <!-- Sonuç alanı -->
+    <div class="form-group mb-3">
+        <label asp-for="Sonuc">Sonuç</label>
+        <select asp-for="Sonuc" class="form-control">
+            <option value="">-- Seçiniz --</option>
+            <option value="Olumlu">Olumlu</option>
+            <option value="Olumsuz">Olumsuz</option>
+        </select>
+        <span asp-validation-for="Sonuc" class="text-danger"></span>
+    </div>
+
+    <!-- Rapor metni -->
+    <div class="form-group mb-3">
+        <label asp-for="RaporDosyasi">Rapor Metni</label>
+        <textarea asp-for="RaporDosyasi" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="RaporDosyasi" class="text-danger"></span>
+    </div>
+
+    <!-- Gönder / Geri -->
+    <button type="submit" class="btn btn-success">Gönder</button>
+    <a asp-action="GelenBasvurular" class="btn btn-secondary ms-2">Geri</a>
+</form>
+
+<!-- Controller'dan gelen özel bilgi -->
+@if (TempData["Sonuc"] != null)
+{
+    <div class="alert alert-info mt-3">@TempData["Sonuc"]</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

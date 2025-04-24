@@ -1,0 +1,191 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+@{
+    ViewData["Title"] = "Kadro Kriterleri Belirle";
+
+    var kriterListesi = new List<string> {
+        "A. Makaleler", "B. Bilimsel Toplantı Faaliyetleri", "C. Kitaplar",
+        "D. Atıflar", "E. Eğitim-Öğretim Faaliyetleri", "F. Tez Yöneticiliği",
+        "G. Patentler", "I. Editörlük/Yayın Kurulu/Hakemlik", "J. Ödüller",
+        "K. İdari Görevler ve Üniversiteye Katkı", "L. Güzel Sanatlar Faaliyetleri"
+    };
+
+    var temelAlanlar = new List<string> {
+        "Sağlık Bilimleri", "Fen Bilimleri", "Mühendislik", "Sosyal Bilimler"
+    };
+
+    var seciliUnvan = Model.KadroKriterleri.FirstOrDefault()?.Unvan ?? "";
+    var seciliTemelAlan = Model.KadroKriterleri.FirstOrDefault()?.TemelAlan ?? "";
+}
+
+<h2 class="mb-3">@Model.Baslik – Kadro Kriterleri Belirle</h2>
+<hr />
+
+
+<form method="post" asp-action="KriterBelirle">
+    <input type="hidden" name="ilanId" value="@Model.IlanId" />
+    <input type="hidden" id="altBelgeJson" name="AltBelgeJson" />
+
+    <!-- Temel Alan -->
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label fw-bold">Temel Alan:</label>
+        <div class="col-sm-6">
+            <select name="TemelAlan" class="form-select" required>
+                @foreach (var alan in temelAlanlar)
+                {
+                    <option value="@alan" selected="@(seciliTemelAlan == alan)">@alan</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- Unvan -->
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label fw-bold">Unvan:</label>
+        <div class="col-sm-6">
+            <select name="Unvan" class="form-select" required>
+                <option value="">-- Unvan Seçin --</option>
+                <option value="Dr. Öğr. Üyesi" selected="@(seciliUnvan == "Dr. Öğr. Üyesi")">Dr. Öğr. Üyesi</option>
+                <option value="Doçent" selected="@(seciliUnvan == "Doçent")">Doçent</option>
+                <option value="Profesör" selected="@(seciliUnvan == "Profesör")">Profesör</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <tbody>
+            @for (int i = 0; i < kriterListesi.Count; i++)
+            {
+                var kriter = kriterListesi[i];
+                var secili = Model.KadroKriterleri.FirstOrDefault(k => k.KriterAdi == kriter);
+
+                <tr class="table-primary text-center fw-bold">
+                    <td colspan="6">@kriter</td>
+                </tr>
+
+                <tr>
+                    <th>Kriter</th>
+                    <th>Açıklama</th>
+                    <th>Zorunlu?</th>
+                    <th>Belge?</th>
+                    <th>Belge Sayısı</th>
+                    <th>Belge Türleri</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        <input type="hidden" name="KriterAdlari[@i]" value="@kriter" />
+                        <input type="checkbox" name="Secilenler" value="@i" @(secili != null ? "checked" : "") />
+                    </td>
+
+                    <td>
+                        <input type="text" name="Aciklamalar[@i]" value="@(secili?.Aciklama ?? "")" class="form-control" />
+                    </td>
+
+                    <td class="text-center">
+                        <input type="checkbox" name="Zorunluluklar" value="@i" @(secili?.ZorunluMu == true ? "checked" : "") />
+                    </td>
+
+                    <td class="text-center">
+                        <input type="checkbox" name="BelgeYuklenebilirlik" value="@i" @(secili?.BelgeYuklenecekMi == true ? "checked" : "") />
+                    </td>
+
+                    <td>
+                        <input type="number" name="BelgeSayilari[@i]" value="@(secili?.BelgeSayisi ?? 0)" min="0" class="form-control" />
+                    </td>
+
+                    <td>
+                        <div id="belge-turleri-@i">
+                            @if (secili?.AltBelgeTurleri != null)
+                            {
+                                foreach (var alt in secili.AltBelgeTurleri)
+                                {
+                                    <div class="row mb-2 belge-row" data-kriter-index="@i">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control belge-adi" value="@alt.BelgeTuru" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="number" class="form-control belge-sayisi" value="@alt.BelgeSayisi" min="0" />
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('.row').remove()">❌</button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm belge-turu-ekle" data-index="@i">
+                            + Belge Türü Ekle
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mt-4">
+        <button type="submit" class="btn btn-success">💾 Kriterleri Kaydet</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        var belgeIndexler = {};
+        var altBelgeData = [];
+
+        $(".belge-turu-ekle").click(function () {
+            var kriterIndex = $(this).data("index");
+
+            if (!belgeIndexler[kriterIndex]) {
+                belgeIndexler[kriterIndex] = $(`#belge-turleri-${kriterIndex} .belge-row`).length;
+            }
+
+            var html = `
+                <div class="row mb-2 belge-row" data-kriter-index="${kriterIndex}">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control belge-adi" placeholder="Belge Türü" />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" class="form-control belge-sayisi" placeholder="Belge Sayısı" min="0" value="0" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('.row').remove()">❌</button>
+                    </div>
+                </div>
+            `;
+
+            $(`#belge-turleri-${kriterIndex}`).append(html);
+            belgeIndexler[kriterIndex]++;
+        });
+
+        $("form").submit(function () {
+            altBelgeData = [];
+
+            $(".belge-row").each(function () {
+                var kriterIndex = $(this).data("kriter-index");
+                var belgeAdi = $(this).find(".belge-adi").val();
+                var belgeSayisi = $(this).find(".belge-sayisi").val();
+
+                if (belgeAdi && belgeSayisi !== "") {
+                    altBelgeData.push({
+                        KriterIndex: kriterIndex,
+                        BelgeTuru: belgeAdi.trim(),
+                        BelgeSayisi: parseInt(belgeSayisi)
+                    });
+                }
+            });
+
+            $("#altBelgeJson").val(JSON.stringify(altBelgeData));
+        });
+
+        // Başarı mesajı gösterilecekse düzgün şekilde göster
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        showToast(@Html.Raw(Json.Serialize(TempData["Success"])));
+                    });
+            </text>
+        }
+    </script>
+}

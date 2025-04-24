@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using personelOtomasyon.Connected_Services.KpsService;
 using personelOtomasyon.Data;
 using personelOtomasyon.Data.Static;
 using personelOtomasyon.Data.ViewModels;
@@ -15,15 +16,17 @@ namespace personelOtomasyon.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
-
+        private readonly IKpsService _kpsService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext context)
+            // IKpsService kpsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            //_kpsService = kpsService;
         }
 
         // ---------- PROFİL ----------
@@ -95,7 +98,6 @@ namespace personelOtomasyon.Controllers
                 return View(loginVM);
             }
 
-            // ❗ Rol kontrolü
             var isInRole = await _userManager.IsInRoleAsync(user, loginVM.RequestedRole);
             if (!isInRole)
             {
@@ -110,7 +112,6 @@ namespace personelOtomasyon.Controllers
                 return View(loginVM);
             }
 
-            // Giriş başarılıysa yönlendir
             if (loginVM.RequestedRole == UserRoles.Admin)
                 return RedirectToAction("Dashboard", "Admin");
 
@@ -118,7 +119,7 @@ namespace personelOtomasyon.Controllers
                 return RedirectToAction("Dashboard", "Yonetici");
 
             if (loginVM.RequestedRole == UserRoles.Juri)
-                return RedirectToAction("GelenBasvurular", "Juri");
+                return RedirectToAction("Index", "Juri"); // ⚠️ doğru yönlendirme burası
 
             return RedirectToAction("Index", "Aday"); // Default: Aday
         }
@@ -142,32 +143,62 @@ namespace personelOtomasyon.Controllers
             }
 
             // ✅ KPS Web Servisi ile T.C. Kimlik Doğrulama
+            /* try
+             {
+                 var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
+
+                 // Ad ve Soyad'ı ayır
+                 var ad = registerVM.FullName.Split(" ")[0].ToUpper();
+                 var soyad = registerVM.FullName.Split(" ")[^1].ToUpper();
+
+                 var kpsResult = await client.TCKimlikNoDogrulaAsync(
+                     long.Parse(registerVM.TcKimlikNo),
+                     ad,
+                     soyad,
+                     registerVM.DogumYili
+                 );
+
+                 if (!kpsResult.Body.TCKimlikNoDogrulaResult)
+                 {
+                     TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
+                     return View(registerVM);
+                 }
+             }
+             catch (Exception ex)
+             {
+                 TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
+                 return View(registerVM);
+             }
+            */
+
+            //  Mock ile KPS doğrulama 
+
             try
             {
-                var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
-
-                // Ad ve Soyad'ı ayır
                 var ad = registerVM.FullName.Split(" ")[0].ToUpper();
                 var soyad = registerVM.FullName.Split(" ")[^1].ToUpper();
 
-                var kpsResult = await client.TCKimlikNoDogrulaAsync(
+                var dogrulandiMi = await _kpsService.TcKimlikDogrulaAsync(
                     long.Parse(registerVM.TcKimlikNo),
                     ad,
                     soyad,
                     registerVM.DogumYili
                 );
 
-                if (!kpsResult.Body.TCKimlikNoDogrulaResult)
+                if (!dogrulandiMi)
                 {
-                    TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
+                    TempData["Error"] = "T.C. Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
                     return View(registerVM);
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
+                TempData["Error"] = "Kimlik doğrulama sırasında hata oluştu: " + ex.Message;
                 return View(registerVM);
             }
+
+
+
 
             // ✅ Kullanıcıyı oluştur
             var newUser = new ApplicationUser

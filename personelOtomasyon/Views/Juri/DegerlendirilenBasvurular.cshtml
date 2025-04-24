@@ -1,0 +1,68 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+<h3>✅ Değerlendirilen Başvurular</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Aday Id</th>
+            <th>Aday Adı</th>
+            <th>İlan</th>
+            <th>Başvuru Tarihi</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.KullaniciAdayId</td>
+                <td>@item.Aday.FullName</td>
+                <td>@item.Ilan.Baslik</td>
+                <td>@item.BasvuruTarihi.ToShortDateString()</td>
+                <td>
+                    <a class="btn btn-warning btn-sm"
+                       asp-action="BasvuruDetay"
+                       asp-route-id="@item.BasvuruId"
+                       asp-route-kaynak="degerlendirilmis">
+                        Detay
+                    </a>
+
+                    <a class="btn btn-warning btn-sm"
+                       asp-action="DegerlendirmeGuncelle"
+                       asp-route-id="@item.BasvuruId">
+                        Güncelle
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+
+</table>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
+@if (TempData["GuncellemeMesaji"] != null)
+{
+    <div id="toastMessage" class="toast align-items-center text-bg-success border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                @TempData["GuncellemeMesaji"]
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Kapat"></button>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toastEl = document.getElementById('toastMessage');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
+}

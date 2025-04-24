@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Jüri Paneli";
+}
+
+<h2 class="mb-4">🎓 Jüri Alanı</h2>
+
+<div class="row g-4">
+
+    <!-- 1. Gelen Başvurular -->
+    <div class="col-md-6">
+        <div class="card border-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">📥 Gelen Başvurular</h5>
+                <p class="card-text">Size yönlendirilen başvuruları görüntüleyin ve değerlendirin.</p>
+                <a class="btn btn-primary" asp-controller="Juri" asp-action="GelenBasvurular">Başvuruları Görüntüle</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Değerlendirilen Başvurular -->
+    <div class="col-md-6">
+        <div class="card border-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">✅ Değerlendirilen Başvurular</h5>
+                <p class="card-text">Önceden değerlendirip raporladığınız başvuruları inceleyin.</p>
+                <a class="btn btn-success text-white" asp-controller="Juri" asp-action="DegerlendirilenBasvurular">Değerlendirilenleri Görüntüle</a>
+            </div>
+        </div>
+    </div>
+
+</div>

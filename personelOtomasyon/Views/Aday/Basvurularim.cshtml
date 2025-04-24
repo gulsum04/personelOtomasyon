@@ -4,17 +4,19 @@
 
 @if (!Model.Any())
 {
-    <p>Henüz başvuru yapmadınız.</p>
+    <div class="alert alert-warning">Henüz başvuru yapmadınız.</div>
 }
 else
 {
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>İlan Başlığı</th>
                 <th>Kategori</th>
+                <th>Temel Alan</th>
                 <th>Başvuru Tarihi</th>
                 <th>Durum</th>
+                <th>İşlemler</th>
             </tr>
         </thead>
         <tbody>
@@ -23,6 +25,7 @@ else
                 <tr>
                     <td>@basvuru.Ilan.Baslik</td>
                     <td>@basvuru.Ilan.Kategori</td>
+                    <td>@basvuru.Ilan.TemelAlan</td>
                     <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
                     <td>
                         @if (basvuru.Durum == "Beklemede")
@@ -48,7 +51,14 @@ else
                             <span class="badge bg-dark">@basvuru.Durum</span>
                         }
                     </td>
+                    <td>
+                        <a asp-action="BasvuruDetay" asp-route-id="@basvuru.BasvuruId" class="btn btn-sm btn-outline-info">Detay</a>
 
+                        <!-- Başvuru Silme Butonu -->
+                        <form asp-action="BasvuruSil" asp-route-id="@basvuru.BasvuruId" method="post" class="d-inline" onsubmit="return confirm('Başvuruyu silmek istediğinizden emin misiniz?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>

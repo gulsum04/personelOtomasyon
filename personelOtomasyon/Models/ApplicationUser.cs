@@ -12,6 +12,8 @@ namespace personelOtomasyon.Models
         [Required]
         public string TcKimlikNo { get; set; }
 
+        public int DogumYili { get; set; }
+
         public DateTime KayitTarihi { get; set; }
         public ICollection<Basvuru> Basvurular { get; set; }
         public ICollection<AkademikIlan> Ilanlar { get; set; }

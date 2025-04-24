@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Yönetici Paneli";
+}
+
+<h2 class="mb-4">📊 Yönetici Kontrol Paneli</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-primary mb-4">
+            <div class="card-body">
+                <h5 class="card-title">📋 Tüm İlanlar</h5>
+                <p class="card-text">Yayına alınacak, kriter belirlenecek veya yayınlanan ilanları yönet.</p>
+                <a asp-action="IlanListesi" asp-controller="Yonetici" class="btn btn-primary">İlanları Yönet</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-success mb-4">
+            <div class="card-body">
+                <h5 class="card-title">📢 Yayındaki İlanlar</h5>
+                <p class="card-text">Adayların erişebildiği aktif ilanları görüntüle.</p>
+                <a asp-action="YayinlananIlanlar" asp-controller="Yonetici" class="btn btn-success">Yayınlananlar</a>
+            </div>
+        </div>
+    </div>
+</div>

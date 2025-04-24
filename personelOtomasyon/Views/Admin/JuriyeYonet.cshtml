@@ -1,23 +1,140 @@
 ﻿@{
-    ViewData["Title"] = "Jüri Atama";
+    ViewData["Title"] = "Başvuruya Jüri Atama";
     var basvuru = ViewBag.Basvuru as personelOtomasyon.Models.Basvuru;
-    var juriList = ViewBag.JuriList as List<personelOtomasyon.Models.JuriUyesi>;
+    var atanabilirJuriListesi = ViewBag.AtanabilirJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
+    var atanmisJuriListesi = ViewBag.AtanmisJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
 }
 
-<h4>Başvuru Sahibi: @basvuru?.Aday?.FullName</h4>
-<h5>İlan: @basvuru?.Ilan?.Baslik</h5>
+<h3>Başvuruyu Jüriye Yönlendirme</h3>
 
-<form asp-action="JuriyeYonet" method="post">
-    <input type="hidden" name="basvuruId" value="@basvuru.BasvuruId" />
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>İlan Başlığı:</strong> @basvuru.Ilan?.Baslik</p>
+        <p><strong>Aday:</strong> @basvuru.Aday?.FullName (@basvuru.Aday?.TcKimlikNo)</p>
+        <p><strong>Başvuru Durumu:</strong> @basvuru.Durum</p>
+    </div>
+</div>
 
-    @foreach (var juri in juriList)
+<!-- ✅ Yönlendirilmiş Jüriler -->
+<h5>🧑‍⚖️ Başvuruya Yönlendirilmiş Jüri Üyeleri</h5>
+<ul class="list-group mb-4" id="atanmis-juriler">
+    @if (atanmisJuriListesi != null && atanmisJuriListesi.Any())
     {
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="seciliJuriIdler" value="@juri.KullaniciJuriId" id="juri-@juri.KullaniciJuriId" />
-            <label class="form-check-label" for="juri-@juri.KullaniciJuriId">@juri.Juri.FullName</label>
-        </div>
+        foreach (var juri in atanmisJuriListesi)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center" id="atanan-juri-@juri.Id">
+                <span>@juri.FullName (@juri.TcKimlikNo)</span>
+                <button class="btn btn-sm btn-danger" onclick="juriSil('@juri.Id')">Sil</button>
+            </li>
+        }
     }
+    else
+    {
+        <li class="list-group-item text-warning text-center">Bu başvuruya henüz jüri yönlendirilmemiş.</li>
+    }
+</ul>
 
-    <button type="submit" class="btn btn-success mt-3" asp-controller="Basvuru" asp-action="Index">Gönder</button>
-    <a asp-controller="Basvuru" asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
-</form>
+<!-- 🔄 Yönlendirilebilecek Jüriler -->
+@if (atanabilirJuriListesi != null && atanabilirJuriListesi.Any())
+{
+    <h5>📋 Başvuruya Yönlendirilebilecek Jüri Üyeleri</h5>
+    <form id="juriAtamaForm">
+        <input type="hidden" name="basvuruId" id="basvuruId" value="@basvuru.BasvuruId" />
+        <div id="atanabilir-juri-listesi">
+            @foreach (var juri in atanabilirJuriListesi)
+            {
+                <div class="form-check" id="juri-@juri.Id">
+                    <input class="form-check-input" type="checkbox"
+                           name="seciliJuriIdler" value="@juri.Id"
+                           id="input-juri-@juri.Id" />
+                    <label class="form-check-label" for="input-juri-@juri.Id">
+                        @juri.FullName (@juri.TcKimlikNo)
+                    </label>
+                </div>
+            }
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Başvuruya Yönlendir</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-info">Bu başvuruya yönlendirilebilecek jüri kalmadı.</div>
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const basvuruId = $("#basvuruId").val();
+
+        // ✅ Atama işlemi
+        $("#juriAtamaForm").on("submit", function (e) {
+            e.preventDefault();
+            let seciliJuriIdler = [];
+
+            $("input[name='seciliJuriIdler']:checked").each(function () {
+                seciliJuriIdler.push($(this).val());
+            });
+
+            if (seciliJuriIdler.length === 0) {
+                alert("Lütfen en az bir jüri seçin.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Admin/JuriyeAtaAjax',
+                type: 'POST',
+                traditional: true,
+                data: { basvuruId, seciliJuriIdler },
+                success: function (response) {
+                    if (response.success) {
+                        $("#atanmis-juriler .text-warning").remove(); // uyarı varsa kaldır
+                        response.atananlar.forEach(juri => {
+                            $("#atanmis-juriler").append(`
+                                <li class="list-group-item d-flex justify-content-between align-items-center" id="atanan-juri-${juri.id}">
+                                    <span>${juri.adSoyad}</span>
+                                    <button class="btn btn-sm btn-danger" onclick="juriSil('${juri.id}')">Sil</button>
+                                </li>`);
+                            $("#juri-" + juri.id).remove();
+                        });
+
+                        // Tüm atanabilirler bittiyse uyarı göster
+                        if ($("#atanabilir-juri-listesi .form-check").length === 0) {
+                            $("#atanabilir-juri-listesi").html(`<div class="alert alert-info">Bu başvuruya yönlendirilebilecek jüri kalmadı.</div>`);
+                        }
+                    } else {
+                        alert("Atama başarısız.");
+                    }
+                }
+            });
+        });
+
+        // ✅ Silme işlemi
+        function juriSil(juriId) {
+            $.post('/Admin/BasvuruJuriSil', { basvuruId, juriId }, function (response) {
+                if (response.success) {
+                    $("#atanan-juri-" + juriId).remove();
+
+                    // Atanabilir listede bilgi mesajı varsa sil
+                    $("#atanabilir-juri-listesi .alert").remove();
+
+                    $("#atanabilir-juri-listesi").append(`
+                        <div class="form-check" id="juri-${juriId}">
+                            <input class="form-check-input" type="checkbox"
+                                   name="seciliJuriIdler" value="${juriId}"
+                                   id="input-juri-${juriId}" />
+                            <label class="form-check-label" for="input-juri-${juriId}">
+                                ${response.juriAdi}
+                            </label>
+                        </div>`);
+
+                    // Eğer hiç jüri kalmadıysa uyarı göster
+                    if ($("#atanmis-juriler li").length === 0) {
+                        $("#atanmis-juriler").html(`<li class="list-group-item text-warning text-center">Bu başvuruya henüz jüri yönlendirilmemiş.</li>`);
+                    }
+                } else {
+                    alert("Silme işlemi başarısız.");
+                }
+            });
+        }
+    </script>
+}

@@ -12,8 +12,8 @@ using personelOtomasyon.Data;
 namespace personelOtomasyon.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250326191154_AddBasvuruJuriTable")]
-    partial class AddBasvuruJuriTable
+    [Migration("20250408140848_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,6 +191,13 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("TemelAlan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Yayinda")
+                        .HasColumnType("bit");
+
                     b.HasKey("IlanId");
 
                     b.HasIndex("ApplicationUserId");
@@ -294,7 +301,7 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IlanId")
+                    b.Property<int?>("IlanId")
                         .HasColumnType("int");
 
                     b.Property<string>("KullaniciAdayId")
@@ -362,6 +369,35 @@ namespace personelOtomasyon.Migrations
                     b.ToTable("BasvuruJuriAtamalari");
                 });
 
+            modelBuilder.Entity("personelOtomasyon.Models.Bildirim", b =>
+                {
+                    b.Property<int>("BildirimId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BildirimId"));
+
+                    b.Property<string>("KullaniciId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Mesaj")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("OkunduMu")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Tarih")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("BildirimId");
+
+                    b.HasIndex("KullaniciId");
+
+                    b.ToTable("Bildirimler");
+                });
+
             modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
                 {
                     b.Property<int>("RaporId")
@@ -373,8 +409,9 @@ namespace personelOtomasyon.Migrations
                     b.Property<int>("BasvuruId")
                         .HasColumnType("int");
 
-                    b.Property<int>("KullaniciJuriId")
-                        .HasColumnType("int");
+                    b.Property<string>("KullaniciJuriId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RaporDosyasi")
                         .IsRequired()
@@ -388,16 +425,15 @@ namespace personelOtomasyon.Migrations
 
                     b.HasIndex("BasvuruId");
 
+                    b.HasIndex("KullaniciJuriId");
+
                     b.ToTable("DegerlendirmeRaporlari");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.JuriUyesi", b =>
                 {
-                    b.Property<int>("JuriUyesiId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JuriUyesiId"));
+                    b.Property<string>("JuriUyesiId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("IlanId")
                         .HasColumnType("int");
@@ -415,6 +451,31 @@ namespace personelOtomasyon.Migrations
                     b.ToTable("JuriUyeleri");
                 });
 
+            modelBuilder.Entity("personelOtomasyon.Models.KadroKriterAlt", b =>
+                {
+                    b.Property<int>("AltId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AltId"));
+
+                    b.Property<int>("BelgeSayisi")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BelgeTuru")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("KriterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AltId");
+
+                    b.HasIndex("KriterId");
+
+                    b.ToTable("KadroKriterAltlar");
+                });
+
             modelBuilder.Entity("personelOtomasyon.Models.KadroKriteri", b =>
                 {
                     b.Property<int>("KriterId")
@@ -423,9 +484,15 @@ namespace personelOtomasyon.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("KriterId"));
 
-                    b.Property<string>("Gereklilik")
+                    b.Property<string>("Aciklama")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BelgeSayisi")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("BelgeYuklenecekMi")
+                        .HasColumnType("bit");
 
                     b.Property<int>("IlanId")
                         .HasColumnType("int");
@@ -434,10 +501,26 @@ namespace personelOtomasyon.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("KullaniciYoneticiId")
-                        .HasColumnType("int");
+                    b.Property<string>("KullaniciYoneticiId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TemelAlan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Unvan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ZorunluMu")
+                        .HasColumnType("bit");
 
                     b.HasKey("KriterId");
+
+                    b.HasIndex("IlanId");
+
+                    b.HasIndex("KullaniciYoneticiId");
 
                     b.ToTable("KadroKriterleri");
                 });
@@ -517,8 +600,7 @@ namespace personelOtomasyon.Migrations
                     b.HasOne("personelOtomasyon.Models.AkademikIlan", "Ilan")
                         .WithMany("Basvurular")
                         .HasForeignKey("IlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("personelOtomasyon.Models.ApplicationUser", "Aday")
                         .WithMany()
@@ -547,7 +629,7 @@ namespace personelOtomasyon.Migrations
                     b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
                         .WithMany()
                         .HasForeignKey("BasvuruId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
@@ -561,6 +643,17 @@ namespace personelOtomasyon.Migrations
                     b.Navigation("Juri");
                 });
 
+            modelBuilder.Entity("personelOtomasyon.Models.Bildirim", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Kullanici")
+                        .WithMany()
+                        .HasForeignKey("KullaniciId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kullanici");
+                });
+
             modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
                 {
                     b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
@@ -569,7 +662,15 @@ namespace personelOtomasyon.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Juri")
+                        .WithMany()
+                        .HasForeignKey("KullaniciJuriId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Basvuru");
+
+                    b.Navigation("Juri");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.JuriUyesi", b =>
@@ -591,9 +692,41 @@ namespace personelOtomasyon.Migrations
                     b.Navigation("Juri");
                 });
 
+            modelBuilder.Entity("personelOtomasyon.Models.KadroKriterAlt", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.KadroKriteri", "Kriter")
+                        .WithMany("AltBelgeTurleri")
+                        .HasForeignKey("KriterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kriter");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.KadroKriteri", b =>
+                {
+                    b.HasOne("personelOtomasyon.Models.AkademikIlan", "Ilan")
+                        .WithMany("KadroKriterleri")
+                        .HasForeignKey("IlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("personelOtomasyon.Models.ApplicationUser", "Yonetici")
+                        .WithMany()
+                        .HasForeignKey("KullaniciYoneticiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ilan");
+
+                    b.Navigation("Yonetici");
+                });
+
             modelBuilder.Entity("personelOtomasyon.Models.AkademikIlan", b =>
                 {
                     b.Navigation("Basvurular");
+
+                    b.Navigation("KadroKriterleri");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.ApplicationUser", b =>
@@ -606,6 +739,11 @@ namespace personelOtomasyon.Migrations
             modelBuilder.Entity("personelOtomasyon.Models.Basvuru", b =>
                 {
                     b.Navigation("Belgeler");
+                });
+
+            modelBuilder.Entity("personelOtomasyon.Models.KadroKriteri", b =>
+                {
+                    b.Navigation("AltBelgeTurleri");
                 });
 #pragma warning restore 612, 618
         }

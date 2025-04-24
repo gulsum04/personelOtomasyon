@@ -1,0 +1,48 @@
+﻿@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
+
+@{
+    ViewData["Title"] = "Yayınlanan İlanlar";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">📢 Yayında Olan İlanlar</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Henüz yayına alınmış bir ilan bulunmuyor.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Başlık</th>
+                        <th>Temel Alan</th>
+                        <th>Kategori</th>
+                        <th>Yayın Durumu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ilan in Model)
+                    {
+                        <tr>
+                            <td>@ilan.Baslik</td>
+                            <td>@ilan.TemelAlan</td>
+                            <td>@ilan.Kategori</td>
+                            <td class="text-center">
+                                <span class="badge bg-success">YAYINDA</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="text-end mt-3">
+        <a class="btn btn-secondary" asp-action="Dashboard">
+            ⬅ Geri Dön
+        </a>
+    </div>
+</div>

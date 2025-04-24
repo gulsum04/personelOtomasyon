@@ -20,6 +20,9 @@ namespace personelOtomasyon.Models
         public string Aciklama { get; set; }
 
         [Required]
+        public string TemelAlan { get; set; } // ❗ Yeni eklenen alan
+
+        [Required]
         [DataType(DataType.Date)]
         public DateTime BasvuruBaslangicTarihi { get; set; }
 
@@ -27,14 +30,22 @@ namespace personelOtomasyon.Models
         [DataType(DataType.Date)]
         public DateTime BasvuruBitisTarihi { get; set; }
 
-        [ValidateNever] // ❗ Kullanıcıdan gelmeyecek
+        [ValidateNever]
         public string KullaniciAdminId { get; set; }
 
-        [ValidateNever] // ❗ Navigation property
         [ForeignKey("KullaniciAdminId")]
+        [ValidateNever]
         public ApplicationUser Admin { get; set; }
 
-        [ValidateNever] // ❗ Formdan gelmez
+        [ValidateNever]
+        public bool Yayinda { get; set; } = false;
+
+        [ValidateNever]
+        public ICollection<KadroKriteri> KadroKriterleri { get; set; }
+
+        [ValidateNever]
         public ICollection<Basvuru> Basvurular { get; set; }
+
     }
+
 }

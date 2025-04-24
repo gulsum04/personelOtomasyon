@@ -1,0 +1,39 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+<h3>📂 Gelen Başvurular</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center mt-4" role="alert">
+        Henüz değerlendirebileceğiniz bir başvuru yok.
+    </div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Aday</th>
+                <th>İlan</th>
+                <th>Başvuru Tarihi</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Aday.FullName</td>
+                    <td>@item.Ilan.Baslik</td>
+                    <td>@item.BasvuruTarihi.ToShortDateString()</td>
+                    <td>
+                        <a class="btn btn-info btn-sm me-2" asp-action="BasvuruDetay" asp-route-id="@item.BasvuruId">Detay</a>
+                        <a class="btn btn-success btn-sm" asp-action="Degerlendir" asp-route-id="@item.BasvuruId">Değerlendir</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>

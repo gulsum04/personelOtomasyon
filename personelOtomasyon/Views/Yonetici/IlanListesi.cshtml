@@ -1,0 +1,77 @@
+﻿@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
+
+@{
+    ViewData["Title"] = "İlan Listesi";
+}
+
+<h2>📋 Yönetici – İlan Yönetimi</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Başlık</th>
+            <th>Temel Alan</th>
+            <th>Kategori</th>
+            <th>Kriter Durumu</th>
+            <th>Yayın Durumu</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ilan in Model)
+        {
+            var renk = ilan.Yayinda ? "table-success" : "table-warning";
+            <tr class="@renk">
+                <td>@ilan.Baslik</td>
+                <td>@ilan.TemelAlan</td>
+                <td>@ilan.Kategori</td>
+                <td>
+                    @if (ilan.KadroKriterleri != null && ilan.KadroKriterleri.Any())
+                    {
+                        <span class="badge bg-info">Belirlendi</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Belirlenmedi</span>
+                    }
+                </td>
+                <td>
+                    @if (ilan.Yayinda)
+                    {
+                        <span class="badge bg-success">YAYINDA</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">YAYINDA DEĞİL</span>
+                    }
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary mb-1" asp-action="KriterBelirle" asp-route-id="@ilan.IlanId">
+                        📝 Kriter Belirle / Güncelle
+                    </a>
+
+                    @if (!ilan.Yayinda && ilan.KadroKriterleri != null && ilan.KadroKriterleri.Any())
+                    {
+                        <a class="btn btn-sm btn-success mt-1 ms-1"
+                           asp-action="IlanYayinla"
+                           asp-route-id="@ilan.IlanId"
+                           onclick="return confirm('Bu ilan yayına alınsın mı?');">
+                            🌐 Yayına Al
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-secondary" asp-action="Dashboard">🔙 Geri Dön</a>

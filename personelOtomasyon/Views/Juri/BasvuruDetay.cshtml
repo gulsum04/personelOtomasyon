@@ -1,0 +1,35 @@
+﻿@model personelOtomasyon.Models.Basvuru
+
+<h3>📌 Başvuru Detayı</h3>
+
+<p><b>Aday Id:</b> @Model.KullaniciAdayId</p>
+<p><b>Aday Adı:</b> @(Model.Aday?.FullName ?? "Bilinmiyor")</p>
+<p><b>İlan Başlığı:</b> @Model.Ilan.Baslik</p>
+
+<h4>Yüklenen Belgeler:</h4>
+<ul>
+    @foreach (var belge in Model.Belgeler)
+    {
+        <li><a href="@belge.DosyaYolu" target="_blank">@belge.BelgeTuru</a></li>
+    }
+</ul>
+
+<hr />
+
+@if (ViewBag.Rapor != null)
+{
+    <h4>📝 Değerlendirme Raporunuz</h4>
+    <p><b>Sonuç:</b> @ViewBag.Rapor.Sonuc</p>
+    <p><b>Rapor:</b> @ViewBag.Rapor.RaporDosyasi</p>
+}
+else
+{
+    <p class="text-muted">Bu başvuru için henüz değerlendirme yapılmamış.</p>
+}
+
+@if (ViewBag.Kaynak != "degerlendirilmis")
+{
+    <a class="btn btn-success" asp-action="Degerlendir" asp-route-id="@Model.BasvuruId">Değerlendir</a>
+}
+
+<a asp-action="GelenBasvurular" class="btn btn-secondary">Geri</a>
