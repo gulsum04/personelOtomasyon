@@ -1,35 +1,91 @@
 ﻿@model personelOtomasyon.Models.Basvuru
 
-<h3>📌 Başvuru Detayı</h3>
+@{
+    ViewData["Title"] = "Başvuru İncele";
+}
 
-<p><b>Aday Id:</b> @Model.KullaniciAdayId</p>
-<p><b>Aday Adı:</b> @(Model.Aday?.FullName ?? "Bilinmiyor")</p>
-<p><b>İlan Başlığı:</b> @Model.Ilan.Baslik</p>
-
-<h4>Yüklenen Belgeler:</h4>
-<ul>
-    @foreach (var belge in Model.Belgeler)
-    {
-        <li><a href="@belge.DosyaYolu" target="_blank">@belge.BelgeTuru</a></li>
-    }
-</ul>
-
+<h2 class="mb-4">📄 Başvuru İncelemesi</h2>
 <hr />
 
-@if (ViewBag.Rapor != null)
-{
-    <h4>📝 Değerlendirme Raporunuz</h4>
-    <p><b>Sonuç:</b> @ViewBag.Rapor.Sonuc</p>
-    <p><b>Rapor:</b> @ViewBag.Rapor.RaporDosyasi</p>
-}
-else
-{
-    <p class="text-muted">Bu başvuru için henüz değerlendirme yapılmamış.</p>
-}
+<!-- Aday Bilgileri -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        👤 Aday Bilgileri
+    </div>
+    <div class="card-body">
+        <p><strong>Aday TC:</strong> @Model.Aday?.TcKimlikNo</p>
+        <p><strong>Aday Adı Soyadı:</strong> @Model.Aday?.FullName</p>
+    </div>
+</div>
 
-@if (ViewBag.Kaynak != "degerlendirilmis")
-{
-    <a class="btn btn-success" asp-action="Degerlendir" asp-route-id="@Model.BasvuruId">Değerlendir</a>
-}
+<!-- Başvurulan İlan Bilgileri -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        📋 İlan Bilgileri
+    </div>
+    <div class="card-body">
+        <p><strong>İlan Başlığı:</strong> @Model.Ilan?.Baslik</p>
+        <p><strong>Temel Alan:</strong> @Model.Ilan?.TemelAlan</p>
+        <p><strong>Kategori:</strong> @Model.Ilan?.Kategori</p>
+        <p><strong>Başvuru Tarihleri:</strong> @Model.Ilan?.BasvuruBaslangicTarihi.ToShortDateString() - @Model.Ilan?.BasvuruBitisTarihi.ToShortDateString()</p>
+    </div>
+</div>
 
-<a asp-action="GelenBasvurular" class="btn btn-secondary">Geri</a>
+<!-- Yüklenen Belgeler -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        📁 Adayın Yüklediği Belgeler
+    </div>
+    <div class="card-body">
+        @if (Model.Belgeler != null && Model.Belgeler.Any())
+        {
+            <ul class="list-group">
+                @foreach (var belge in Model.Belgeler)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @belge.BelgeTuru
+                        <a href="@belge.DosyaYolu" target="_blank" class="btn btn-sm btn-outline-primary">Görüntüle</a>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="alert alert-warning">Bu başvuru için henüz belge yüklenmemiş.</div>
+        }
+    </div>
+</div>
+
+<!-- Değerlendirme Sonucu (Varsa) -->
+<div class="card mb-4">
+    <div class="card-header bg-secondary text-white">
+        📝 Değerlendirme Raporu
+    </div>
+    <div class="card-body">
+        @if (ViewBag.Rapor != null)
+        {
+            <p><strong>Sonuç:</strong> @ViewBag.Rapor.Sonuc</p>
+            <p>
+                <strong>Rapor Dosyası:</strong>
+                <a href="@ViewBag.Rapor.RaporDosyasi" target="_blank" class="btn btn-sm btn-outline-primary ms-2">📄 Görüntüle</a>
+            </p>
+        }
+        else
+        {
+            <div class="alert alert-warning">Bu başvuru için henüz değerlendirme yapılmamış.</div>
+        }
+    </div>
+</div>
+
+<!-- İşlem Butonları -->
+<div class="d-flex justify-content-between mt-4">
+    @if (ViewBag.Rapor == null)
+    {
+        <a asp-action="Degerlendir" asp-route-id="@Model.BasvuruId" class="btn btn-success">
+            ✅ Değerlendirme Yap
+        </a>
+    }
+    <a asp-action="GelenBasvurular" class="btn btn-secondary">
+        ⬅ Geri Dön
+    </a>
+</div>

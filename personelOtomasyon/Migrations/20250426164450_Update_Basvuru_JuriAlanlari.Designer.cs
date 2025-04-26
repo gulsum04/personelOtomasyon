@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using personelOtomasyon.Data;
 
@@ -11,9 +12,11 @@ using personelOtomasyon.Data;
 namespace personelOtomasyon.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250426164450_Update_Basvuru_JuriAlanlari")]
+    partial class Update_Basvuru_JuriAlanlari
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,7 +300,7 @@ namespace personelOtomasyon.Migrations
                     b.Property<DateTime>("BasvuruTarihi")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("DegerlendirmeTamamlandiMi")
+                    b.Property<bool>("DegerlendirmeTamamlandiMi")
                         .HasColumnType("bit");
 
                     b.Property<string>("Durum")
@@ -308,9 +311,11 @@ namespace personelOtomasyon.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("JuriRaporu")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("JuriSonucu")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("KullaniciAdayId")
@@ -669,7 +674,7 @@ namespace personelOtomasyon.Migrations
             modelBuilder.Entity("personelOtomasyon.Models.DegerlendirmeRaporu", b =>
                 {
                     b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
-                        .WithMany("DegerlendirmeRaporlari")
+                        .WithMany()
                         .HasForeignKey("BasvuruId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -751,8 +756,6 @@ namespace personelOtomasyon.Migrations
             modelBuilder.Entity("personelOtomasyon.Models.Basvuru", b =>
                 {
                     b.Navigation("Belgeler");
-
-                    b.Navigation("DegerlendirmeRaporlari");
                 });
 
             modelBuilder.Entity("personelOtomasyon.Models.KadroKriteri", b =>

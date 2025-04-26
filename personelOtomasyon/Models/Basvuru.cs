@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace personelOtomasyon.Models
@@ -22,5 +24,11 @@ namespace personelOtomasyon.Models
         public string Durum { get; set; }
 
         public ICollection<BasvuruBelge> Belgeler { get; set; }
+        public ICollection<DegerlendirmeRaporu> DegerlendirmeRaporlari { get; set; }
+
+        public string? JuriSonucu { get; set; }
+        public string? JuriRaporu { get; set; }
+        public bool? DegerlendirmeTamamlandiMi { get; set; } = false;
+        public int? ToplamPuan { get; set; }
     }
 }

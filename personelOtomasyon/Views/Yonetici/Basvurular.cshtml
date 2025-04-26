@@ -1,0 +1,104 @@
+﻿@model IEnumerable<personelOtomasyon.Models.Basvuru>
+
+@{
+    ViewData["Title"] = "Başvurular";
+}
+
+<h2 class="mb-4">Başvurular</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">Başvuru bulunamadı.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>İlan Başlığı</th>
+                    <th>Aday Adı</th>
+                    <th>Başvuru Tarihi</th>
+                    <th>Durum</th>
+                    <th>Jüri Sonucu</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var basvuru in Model)
+                {
+                    <tr>
+                        <td>@basvuru.Ilan?.Baslik</td>
+                        <td>@basvuru.Aday?.FullName</td>
+                        <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
+
+                        <!-- 🧩 DURUM Hesaplama -->
+                        <td>
+                            @{
+                                string durumGosterilecek = basvuru.Durum;
+
+                                if (string.IsNullOrEmpty(basvuru.JuriSonucu))
+                                {
+                                    // Jüri sonucu henüz belirlenmediyse başvuru beklemede görünür
+                                    durumGosterilecek = "Beklemede";
+                                }
+                                else if (basvuru.JuriSonucu == "Olumsuz")
+                                {
+                                    durumGosterilecek = "Reddedildi";
+                                }
+                                else if (basvuru.JuriSonucu == "Olumlu")
+                                {
+                                    // Olumluysa beklemede olarak devam (puanlama bekleniyor)
+                                    durumGosterilecek = "Beklemede";
+                                }
+                            }
+
+                            @if (durumGosterilecek == "Reddedildi")
+                            {
+                                <span class="badge bg-danger">Reddedildi</span>
+                            }
+                            else if (durumGosterilecek == "Onaylandı")
+                            {
+                                <span class="badge bg-success">Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Beklemede</span>
+                            }
+                        </td>
+
+                        <!-- 🧩 JÜRI SONUCU Gösterimi -->
+                        <td>
+                            @if (!string.IsNullOrEmpty(basvuru.JuriSonucu))
+                            {
+                                <span class="badge @(basvuru.JuriSonucu == "Olumlu" ? "bg-success" : "bg-danger")">
+                                    @basvuru.JuriSonucu
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Belirlenmedi</span>
+                            }
+                        </td>
+
+                        <!-- 🧩 İŞLEMLER -->
+                        <td class="d-flex justify-content-center gap-2">
+                            <a asp-action="BasvuruDetay" asp-route-id="@basvuru.BasvuruId" class="btn btn-sm btn-primary">
+                                Detay
+                            </a>
+
+                            @* Eğer jüri değerlendirme raporları geldiyse "İncele" butonu göster *@
+                            @if (basvuru.DegerlendirmeRaporlari != null && basvuru.DegerlendirmeRaporlari.Any())
+                            {
+                                <a asp-action="JuriDegerlendirmeIncele" asp-route-id="@basvuru.BasvuruId" class="btn btn-sm btn-info">
+                                    Jüri İncele
+                                </a>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

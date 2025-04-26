@@ -2,82 +2,101 @@
 
 @{
     ViewData["Title"] = "Başvurular";
-    // ❗ ViewBag null olabilir, bu yüzden güvenli hale getiriyoruz:
+    // ❗ ViewBag null olabilir, güvenli hale getiriyoruz:
     var juriDurumlari = ViewBag.JuriAtamaDurumlari as Dictionary<int, bool> ?? new Dictionary<int, bool>();
 }
 
 <h2 class="mb-4">📂 Tüm Başvurular</h2>
 
-<table class="table table-bordered table-hover">
-    <thead class="table-red">
-        <tr>
-            <th>#</th>
-            <th>İlan Başlığı</th>
-            <th>Kategori</th>
-            <th>Aday</th>
-            <th>Başvuru Tarihi</th>
-            <th>Durum</th>
-            <th>Jüri Durumu</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var basvuru in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
             <tr>
-                <td>@basvuru.BasvuruId</td>
-                <td>@basvuru.Ilan?.Baslik</td>
-                <td>@basvuru.Ilan?.Kategori</td>
-                <td>@basvuru.Aday?.FullName</td>
-                <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
-
-                <td>
-                    @switch (basvuru.Durum)
-                    {
-                        case "Onaylandı":
-                            <span class="badge bg-success">
-                                <i class="bi bi-check-circle-fill"></i> Onaylandı
-                            </span>
-                            break;
-                        case "Reddedildi":
-                            <span class="badge bg-danger">
-                                <i class="bi bi-x-circle-fill"></i> Reddedildi
-                            </span>
-                            break;
-                        default:
-                            <span class="badge bg-secondary">
-                                <i class="bi bi-hourglass-split"></i> Beklemede
-                            </span>
-                            break;
-                    }
-                </td>
-
-                <!-- 🔍 Jüri Durumu -->
-                <td>
-                    @if (juriDurumlari.TryGetValue(basvuru.BasvuruId, out var juriAtandi) && juriAtandi)
-                    {
-                        <span class="badge bg-info text-dark">
-                            <i class="bi bi-people-fill"></i> Jüriye Yönlendirildi
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">
-                            <i class="bi bi-person-dash"></i> Jüriye Yönlendirilmedi
-                        </span>
-                    }
-                </td>
-
-                <!-- 🔧 İşlemler -->
-                <td>
-                    <a class="btn btn-sm btn-warning"
-                       asp-controller="Admin"
-                       asp-action="JuriyeYonet"
-                       asp-route-basvuruId="@basvuru.BasvuruId">
-                        Jüriye Yönlendir
-                    </a>
-                </td>
+                <th>#</th>
+                <th>İlan Başlığı</th>
+                <th>Kategori</th>
+                <th>Aday</th>
+                <th>Başvuru Tarihi</th>
+                <th>Durum</th>
+                <th>Jüri Durumu</th>
+                <th>İşlemler</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var basvuru in Model)
+            {
+                <tr>
+                    <td>@basvuru.BasvuruId</td>
+                    <td>@basvuru.Ilan?.Baslik</td>
+                    <td>@basvuru.Ilan?.Kategori</td>
+                    <td>@basvuru.Aday?.FullName</td>
+                    <td>@basvuru.BasvuruTarihi.ToShortDateString()</td>
+
+                    <!-- 🧩 DURUM Hesaplama -->
+                    <td>
+                        @{
+                            string durumGosterilecek = basvuru.Durum;
+
+                            if (!string.IsNullOrEmpty(basvuru.JuriSonucu))
+                            {
+                                if (basvuru.JuriSonucu == "Olumsuz")
+                                {
+                                    durumGosterilecek = "Reddedildi";
+                                }
+                                else if (basvuru.JuriSonucu == "Olumlu")
+                                {
+                                    durumGosterilecek = "Beklemede"; // Şu an için beklemede
+                                }
+                            }
+                        }
+
+                        @switch (durumGosterilecek)
+                        {
+                            case "Onaylandı":
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle-fill"></i> Onaylandı
+                                </span>
+                                break;
+                            case "Reddedildi":
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle-fill"></i> Reddedildi
+                                </span>
+                                break;
+                            default:
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-hourglass-split"></i> Beklemede
+                                </span>
+                                break;
+                        }
+                    </td>
+
+                    <!-- 🔍 Jüri Durumu -->
+                    <td>
+                        @if (juriDurumlari.TryGetValue(basvuru.BasvuruId, out var juriAtandi) && juriAtandi)
+                        {
+                            <span class="badge bg-info text-dark">
+                                <i class="bi bi-people-fill"></i> Jüriye Yönlendirildi
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-person-dash"></i> Jüriye Yönlendirilmedi
+                            </span>
+                        }
+                    </td>
+
+                    <!-- 🔧 İşlemler -->
+                    <td>
+                        <a class="btn btn-sm btn-warning"
+                           asp-controller="Admin"
+                           asp-action="JuriyeYonet"
+                           asp-route-basvuruId="@basvuru.BasvuruId">
+                            Jüriye Yönlendir
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
