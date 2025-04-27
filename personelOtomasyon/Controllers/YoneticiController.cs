@@ -204,7 +204,7 @@ namespace personelOtomasyon.Controllers
                 .Include(b => b.Aday)
                 .Include(b => b.DegerlendirmeRaporlari)
                     .ThenInclude(r => r.Juri)
-                .Where(b => b.DegerlendirmeRaporlari.Count == 5) // Sadece 5 jüri değerlendirmişse
+                .Where(b => b.DegerlendirmeRaporlari.Count == 1) // Sadece 5 jüri değerlendirmişse
                 .ToList();
 
             return View(basvurular);

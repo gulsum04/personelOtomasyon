@@ -13,22 +13,26 @@
         📋 İlan Bilgileri
     </div>
     <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Başlık:</dt>
-            <dd class="col-sm-9">@Model.Baslik</dd>
-
-            <dt class="col-sm-3">Temel Alan:</dt>
-            <dd class="col-sm-9">@Model.TemelAlan</dd>
-
-            <dt class="col-sm-3">Kategori:</dt>
-            <dd class="col-sm-9">@Model.Kategori</dd>
-
-            <dt class="col-sm-3">Başvuru Tarihleri:</dt>
-            <dd class="col-sm-9">@Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</dd>
-
-            <dt class="col-sm-3">Açıklama:</dt>
-            <dd class="col-sm-9">@(!string.IsNullOrEmpty(Model.Aciklama) ? Model.Aciklama : "Açıklama belirtilmedi.")</dd>
-        </dl>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Başlık:</div>
+            <div class="col-sm-9">@Model.Baslik</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Temel Alan:</div>
+            <div class="col-sm-9">@Model.TemelAlan</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Kategori:</div>
+            <div class="col-sm-9">@Model.Kategori</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Başvuru Tarihleri:</div>
+            <div class="col-sm-9">@Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Açıklama:</div>
+            <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.Aciklama) ? Model.Aciklama : "Açıklama belirtilmedi.")</div>
+        </div>
     </div>
 </div>
 
@@ -96,10 +100,51 @@ else
     <a asp-action="Index" class="btn btn-secondary">
         ⬅ Yayındaki İlanlara Dön
     </a>
+
     @if (Model.Yayinda)
     {
-        <a asp-action="Basvur" asp-route-id="@Model.IlanId" class="btn btn-primary">
-            Başvur
-        </a>
+        if (ViewBag.BasvurduMu == true)
+        {
+            <!-- Başvuru yapıldıysa: Modal açacak buton -->
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#basvuruModal" style="opacity: 0.6;">
+                Başvur
+            </button>
+        }
+        else
+        {
+            <!-- Henüz başvurmadıysa: Normal başvuru linki -->
+            <a asp-action="Basvur" asp-route-id="@Model.IlanId" class="btn btn-primary">
+                Başvur
+            </a>
+        }
     }
 </div>
+
+<!-- Başvuru Yapıldı Modalı -->
+<div class="modal fade" id="basvuruModal" tabindex="-1" aria-labelledby="basvuruModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="basvuruModalLabel">Başvuru Durumu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem; color: orange;"></i>
+                <p class="mt-3 mb-0 fs-5">Bu ilana zaten başvurdunuz!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var myModal = document.getElementById('basvuruModal');
+        myModal.addEventListener('shown.bs.modal', function () {
+            setTimeout(function () {
+                var modalInstance = bootstrap.Modal.getInstance(myModal);
+                modalInstance.hide();
+            }, 2000);
+        });
+    </script>
+}

@@ -25,9 +25,11 @@ namespace personelOtomasyon.Data
             // Aday - Başvuru ilişkisi (Restrict)
             modelBuilder.Entity<Basvuru>()
                 .HasOne(b => b.Aday)
-                .WithMany()
+                .WithMany(u => u.Basvurular)
                 .HasForeignKey(b => b.KullaniciAdayId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
 
             // Admin - İlan ilişkisi (Restrict)
             modelBuilder.Entity<AkademikIlan>()

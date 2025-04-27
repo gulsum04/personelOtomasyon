@@ -18,8 +18,8 @@ namespace personelOtomasyon.Models
         public string KullaniciAdayId { get; set; }
 
         [ForeignKey("KullaniciAdayId")]
-        public ApplicationUser Aday { get; set; }
-
+    
+        public virtual ApplicationUser Aday { get; set; }
         public DateTime BasvuruTarihi { get; set; }
         public string Durum { get; set; }
 

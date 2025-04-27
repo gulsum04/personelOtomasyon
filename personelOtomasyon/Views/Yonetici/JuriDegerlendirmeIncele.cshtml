@@ -1,14 +1,12 @@
 ﻿@model personelOtomasyon.Models.Basvuru
 
-@{
-    ViewData["Title"] = "Jüri Değerlendirmeleri";
-}
-
 <h2 class="mb-4">📋 Jüri Değerlendirmeleri</h2>
 
 <div class="mb-4">
     <h4>İlan Başlığı: <span class="text-primary">@Model.Ilan?.Baslik</span></h4>
-    <h5>Aday Adı: <span class="text-secondary">@Model.Aday?.FullName</span></h5>
+    <h5>Aday Id: <span class="text-secondary">@Model.KullaniciAdayId</span></h5>
+    @* <h5>Aday Adı: <span class="text-secondary">@Model.Aday?.FullName</span></h5>*@
+
 </div>
 
 @if (Model.DegerlendirmeRaporlari != null && Model.DegerlendirmeRaporlari.Any())
@@ -40,14 +38,8 @@
             </tbody>
         </table>
     </div>
-
-   
 }
 else
 {
     <div class="alert alert-warning">Henüz jüri değerlendirmesi bulunmamaktadır.</div>
 }
-
-<div class="mt-4 text-end">
-    <a asp-action="Basvurular" class="btn btn-secondary">⬅ Başvurulara Dön</a>
-</div>

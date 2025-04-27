@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace personelOtomasyon.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Yonetici")]
     public class AdayController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +19,7 @@ namespace personelOtomasyon.Controllers
             _userManager = userManager;
         }
 
-        // Yayındaki ilanları ve kullanıcının başvuru durumunu göster
+        // Yayındaki ilanlar
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -41,7 +41,32 @@ namespace personelOtomasyon.Controllers
             return View(ilanlar);
         }
 
-        // İlan detayından başvuru yap sayfasına yönlendirme
+        // İlan detay
+        public async Task<IActionResult> IlanDetay(int id)
+        {
+            var ilan = await _context.AkademikIlanlar
+                .Include(i => i.KadroKriterleri)
+                    .ThenInclude(k => k.AltBelgeTurleri)
+                .FirstOrDefaultAsync(i => i.IlanId == id);
+
+            if (ilan == null)
+                return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            bool basvurduMu = false;
+
+            if (user != null)
+            {
+                basvurduMu = await _context.Basvurular
+                    .AnyAsync(b => b.IlanId == id && b.KullaniciAdayId == user.Id);
+            }
+
+            ViewBag.BasvurduMu = basvurduMu;
+
+            return View(ilan);
+        }
+
+        // Başvuru yap sayfası
         public async Task<IActionResult> Basvur(int id)
         {
             var ilan = await _context.AkademikIlanlar
@@ -58,7 +83,7 @@ namespace personelOtomasyon.Controllers
             return View(ilan);
         }
 
-        // Başvuru işlemi (en optimize edilmiş hali)
+        // Başvuru yap post
         [HttpPost]
         public async Task<IActionResult> BasvuruYap(int ilanId, List<IFormFile> belgeler, List<string> belgeTurleri)
         {
@@ -77,7 +102,6 @@ namespace personelOtomasyon.Controllers
                 return RedirectToAction("Index");
             }
 
-            // 📌 Gerekli belge sayısını dinamik hesapla
             int toplamGerekliBelge = 0;
             foreach (var kriter in ilan.KadroKriterleri)
             {
@@ -86,7 +110,7 @@ namespace personelOtomasyon.Controllers
                     if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
                         toplamGerekliBelge += kriter.AltBelgeTurleri.Sum(a => a.BelgeSayisi);
                     else
-                        toplamGerekliBelge += 1; // Alt belge yoksa en az 1 belge beklenir
+                        toplamGerekliBelge += 1;
                 }
             }
 
@@ -96,7 +120,6 @@ namespace personelOtomasyon.Controllers
                 return RedirectToAction("Basvur", new { id = ilanId });
             }
 
-            // 📋 Başvuru kaydı oluştur
             var basvuru = new Basvuru
             {
                 IlanId = ilanId,
@@ -106,9 +129,8 @@ namespace personelOtomasyon.Controllers
             };
 
             _context.Basvurular.Add(basvuru);
-            await _context.SaveChangesAsync(); // BaşvuruId almak için
+            await _context.SaveChangesAsync();
 
-            // 📁 Belgeleri kaydet
             for (int i = 0; i < belgeler.Count; i++)
             {
                 var belge = belgeler[i];
@@ -143,14 +165,16 @@ namespace personelOtomasyon.Controllers
             return RedirectToAction("Basvurularim");
         }
 
-
-        // Başvuru Detay Sayfası
+        // Başvuru Detay - düzenlendi
         public async Task<IActionResult> BasvuruDetay(int id)
         {
             var basvuru = await _context.Basvurular
                 .Include(b => b.Ilan)
                     .ThenInclude(i => i.KadroKriterleri)
                 .Include(b => b.Belgeler)
+                .Include(b => b.Aday) //OLMUYOR
+                .Include(b => b.DegerlendirmeRaporlari)
+                    .ThenInclude(r => r.Juri)
                 .FirstOrDefaultAsync(b => b.BasvuruId == id);
 
             if (basvuru == null)
@@ -162,27 +186,8 @@ namespace personelOtomasyon.Controllers
             return View(basvuru);
         }
 
-        public async Task<IActionResult> IlanDetay(int id)
-        {
-            var ilan = await _context.AkademikIlanlar
-                .Include(i => i.KadroKriterleri)
-                    .ThenInclude(k => k.AltBelgeTurleri)
-                .FirstOrDefaultAsync(i => i.IlanId == id);
 
-            if (ilan == null)
-                return NotFound();
-
-            var userId = _userManager.GetUserId(User);
-            var basvuruVarMi = await _context.Basvurular
-                .AnyAsync(b => b.IlanId == id && b.Aday.Id == userId);
-
-            ViewData["BasvuruDurumu"] = basvuruVarMi ? "Başvuruldu" : "Başvurulmadı";
-
-            return View(ilan);
-        }
-
-
-        // Adayın yaptığı başvuruları listeleme
+        // Adayın yaptığı başvurular
         public async Task<IActionResult> Basvurularim()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -195,7 +200,7 @@ namespace personelOtomasyon.Controllers
             return View(basvurular);
         }
 
-        // Başvuru Silme
+        // Başvuru Sil
         public async Task<IActionResult> BasvuruSil(int id)
         {
             var basvuru = await _context.Basvurular

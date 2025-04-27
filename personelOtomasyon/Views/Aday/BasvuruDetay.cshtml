@@ -97,7 +97,13 @@
     }
 </div>
 
-<!-- 🔙 Geri Dön -->
 <div class="text-end">
-    <a asp-action="Basvurularim" class="btn btn-secondary">⬅ Başvurularım Listesine Dön</a>
+    @if (User.IsInRole("User"))
+    {
+        <a asp-action="Basvurularim" class="btn btn-secondary">⬅ Başvurularım Listesine Dön</a>
+    }
+    else if (User.IsInRole("Yonetici"))
+    {
+        <a asp-action="Basvurular" asp-controller="Yonetici" class="btn btn-secondary">⬅ Başvuru Listesine Dön</a>
+    }
 </div>
