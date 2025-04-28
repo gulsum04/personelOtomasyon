@@ -17,6 +17,8 @@ namespace personelOtomasyon.Data
         public DbSet<BasvuruJuri> BasvuruJuriAtamalari { get; set; }
         public DbSet<Bildirim> Bildirimler { get; set; }
         public DbSet<KadroKriterAlt> KadroKriterAltlar { get; set; }
+        public DbSet<BasvuruPuan> BasvuruPuanlar { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

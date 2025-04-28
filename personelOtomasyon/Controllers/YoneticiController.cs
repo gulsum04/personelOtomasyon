@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
 using personelOtomasyon.Models;
 using System.Text.Json;
+using System.Linq;
 
 namespace personelOtomasyon.Controllers
 {
@@ -226,6 +227,7 @@ namespace personelOtomasyon.Controllers
             return View(basvuru);
         }
 
+
         // ✅ Final Karar Ver
         [HttpPost]
         public IActionResult FinalKararVer(int id, string karar)
@@ -256,6 +258,72 @@ namespace personelOtomasyon.Controllers
             _context.SaveChanges();
 
             TempData["Success"] = "Nihai karar başarıyla verildi.";
+            return RedirectToAction("Basvurular");
+        }
+
+        // 📜 Belge Puanla (GET)
+        [HttpGet]
+        public IActionResult BelgePuanla(int basvuruId)
+        {
+            var basvuru = _context.Basvurular
+                .Include(b => b.Ilan)
+                    .ThenInclude(i => i.KadroKriterleri)
+                        .ThenInclude(k => k.AltBelgeTurleri)
+                .FirstOrDefault(b => b.BasvuruId == basvuruId);
+
+            if (basvuru == null)
+                return NotFound();
+
+            ViewBag.BasvuruId = basvuruId;
+            ViewBag.IlanBasligi = basvuru.Ilan.Baslik;
+            ViewBag.JuriSonucu = basvuru.JuriSonucu; 
+
+            var altKriterler = basvuru.Ilan.KadroKriterleri
+                .SelectMany(k => k.AltBelgeTurleri)
+                .ToList();
+
+            return View(altKriterler);
+        }
+
+
+
+
+        // 📥 Belge Puanla Kaydet (POST)
+        [HttpPost]
+        public async Task<IActionResult> BelgePuanlaKaydet(int basvuruId, List<string> kriterAdlari, List<string> aciklamalar, List<int> puanlar)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            for (int i = 0; i < kriterAdlari.Count; i++)
+            {
+                var puanKaydi = new BasvuruPuan
+                {
+                    BasvuruId = basvuruId,
+                    BelgeTuru = kriterAdlari[i],
+                    FaaliyetAdi = aciklamalar[i],
+                    Puan = puanlar[i],
+                    YoneticiId = user.Id
+                };
+
+                _context.BasvuruPuanlar.Add(puanKaydi);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Toplam puanı güncelle
+            var toplamPuan = _context.BasvuruPuanlar
+                .Where(x => x.BasvuruId == basvuruId)
+                .Sum(x => x.Puan);
+
+            var basvuru = await _context.Basvurular.FindAsync(basvuruId);
+            if (basvuru != null)
+            {
+                basvuru.ToplamPuan = toplamPuan;
+                _context.Basvurular.Update(basvuru);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Puanlar başarıyla kaydedildi.";
             return RedirectToAction("Basvurular");
         }
 
