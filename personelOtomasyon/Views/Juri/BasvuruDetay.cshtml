@@ -65,15 +65,21 @@
         @if (ViewBag.Rapor != null)
         {
             <p><strong>Sonuç:</strong> @ViewBag.Rapor.Sonuc</p>
-            <p>
-                <strong>Rapor Dosyası:</strong>
-                <a href="@ViewBag.Rapor.RaporDosyasi" target="_blank" class="btn btn-sm btn-outline-primary ms-2">📄 Görüntüle</a>
-            </p>
+
+            <hr />
+
+            <div class="mt-3">
+                <h5><strong>📜 Jüri Raporu:</strong></h5>
+                <div class="border rounded p-3 bg-light">
+                    @ViewBag.Rapor.RaporDosyasi
+                </div>
+            </div>
         }
         else
         {
             <div class="alert alert-warning">Bu başvuru için henüz değerlendirme yapılmamış.</div>
         }
+
     </div>
 </div>
 
@@ -85,7 +91,9 @@
             ✅ Değerlendirme Yap
         </a>
     }
-    <a asp-action="GelenBasvurular" class="btn btn-secondary">
+</div>
+<div class="text-end">
+    <a asp-action="DegerlendirilenBasvurular" class="btn btn-secondary">
         ⬅ Geri Dön
     </a>
 </div>

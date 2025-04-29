@@ -37,6 +37,11 @@
         <span asp-validation-for="RaporDosyasi" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+        <a asp-action="DegerlendirilenBasvurular" class="btn btn-secondary">⬅ Geri Dön</a>
+    </div>
+
+   
 </form>
 

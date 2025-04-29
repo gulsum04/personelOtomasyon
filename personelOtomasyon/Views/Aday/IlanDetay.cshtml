@@ -97,9 +97,6 @@ else
 
 <!-- 🔗 Butonlar -->
 <div class="d-flex justify-content-between mt-4">
-    <a asp-action="Index" class="btn btn-secondary">
-        ⬅ Yayındaki İlanlara Dön
-    </a>
 
     @if (Model.Yayinda)
     {
@@ -118,6 +115,10 @@ else
             </a>
         }
     }
+
+    <a asp-action="Index" class="btn btn-secondary">
+        ⬅ Yayındaki İlanlara Dön
+    </a>
 </div>
 
 <!-- Başvuru Yapıldı Modalı -->

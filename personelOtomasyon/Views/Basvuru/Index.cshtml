@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Başvurular";
-    // ❗ ViewBag null olabilir, güvenli hale getiriyoruz:
     var juriDurumlari = ViewBag.JuriAtamaDurumlari as Dictionary<int, bool> ?? new Dictionary<int, bool>();
 }
 
@@ -37,36 +36,35 @@
                         @{
                             string durumGosterilecek = basvuru.Durum;
 
-                            if (!string.IsNullOrEmpty(basvuru.JuriSonucu))
+                            if (string.IsNullOrEmpty(basvuru.YoneticiSonucu))
                             {
-                                if (basvuru.JuriSonucu == "Olumsuz")
-                                {
-                                    durumGosterilecek = "Reddedildi";
-                                }
-                                else if (basvuru.JuriSonucu == "Olumlu")
-                                {
-                                    durumGosterilecek = "Beklemede"; // Şu an için beklemede
-                                }
+                                // yönetici sonucu henüz belirlenmediyse başvuru beklemede görünür
+                                durumGosterilecek = "Beklemede";
+                            }
+                            else if (basvuru.YoneticiSonucu == "Olumsuz")
+                            {
+                                durumGosterilecek = "Reddedildi";
+                            }
+                            else if (basvuru.YoneticiSonucu == "Olumlu")
+                            {
+
+                                durumGosterilecek = "Onaylandı";
                             }
                         }
 
-                        @switch (durumGosterilecek)
+                        @if (durumGosterilecek == "Reddedildi")
                         {
-                            case "Onaylandı":
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle-fill"></i> Onaylandı
-                                </span>
-                                break;
-                            case "Reddedildi":
-                                <span class="badge bg-danger">
-                                    <i class="bi bi-x-circle-fill"></i> Reddedildi
-                                </span>
-                                break;
-                            default:
-                                <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-hourglass-split"></i> Beklemede
-                                </span>
-                                break;
+                            <span class="badge bg-danger">
+                                <span class="text-white">❌</span> Reddedildi
+                            </span>
+                        }
+                        else if (durumGosterilecek == "Onaylandı")
+                        {
+                            <span class="badge bg-success"> ✅ Onaylandı</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning"> 🕒 Beklemede</span>
                         }
                     </td>
 
@@ -99,4 +97,9 @@
             }
         </tbody>
     </table>
+    <div class="text-end">
+        <a class="btn btn-secondary mt-3" asp-controller="Admin" asp-action="Dashboard">
+            ⬅ Geri Dön
+        </a>
+    </div>
 </div>

@@ -30,5 +30,8 @@ namespace personelOtomasyon.Models
         public string? JuriRaporu { get; set; }
         public bool? DegerlendirmeTamamlandiMi { get; set; } = false;
         public int? ToplamPuan { get; set; }
+        public string? YoneticiSonucu { get; set; }
+
+
     }
 }

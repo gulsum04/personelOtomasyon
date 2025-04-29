@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Başvuruya Jüri Atama";
+    ViewData["Title"] = "Başvuruya Jüri Yönlendirme";
     var basvuru = ViewBag.Basvuru as personelOtomasyon.Models.Basvuru;
     var atanabilirJuriListesi = ViewBag.AtanabilirJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
     var atanmisJuriListesi = ViewBag.AtanmisJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
@@ -60,6 +60,11 @@ else
 {
     <div class="alert alert-info">Bu başvuruya yönlendirilebilecek jüri kalmadı.</div>
 }
+<div class="text-end">
+    <a class="btn btn-secondary mt-3" asp-controller="Basvuru" asp-action="Index">
+        ⬅ Geri Dön
+    </a>
+</div>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

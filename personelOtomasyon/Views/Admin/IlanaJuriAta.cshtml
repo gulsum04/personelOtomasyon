@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Jüri Atama";
+    ViewData["Title"] = "Başvuruya Jüri Atama";
     var ilan = ViewBag.Ilan as personelOtomasyon.Models.AkademikIlan;
     var atanabilecekJuriListesi = ViewBag.AtanabilecekJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
     var atanmisJuriListesi = ViewBag.AtanmisJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
@@ -56,8 +56,12 @@
         }
     </div>
 
-    <button type="submit" class="btn btn-success mt-3">Ata</button>
-    <a asp-controller="Ilan" asp-action="Index" class="btn btn-secondary mt-3">Geri</a>
+     <div class="d-flex justify-content-between align-items-center mt-4">
+        <button type="submit" class="btn btn-success mt-3">Ata</button>
+
+        <a asp-controller="Ilan" asp-action="Index" class="btn btn-secondary mt-3"> ⬅ Geri Dön</a>
+    </div>
+
 </form>
 
 @section Scripts {

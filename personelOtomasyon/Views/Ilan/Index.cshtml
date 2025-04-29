@@ -30,7 +30,7 @@
                     @ilan.BasvuruBaslangicTarihi.ToShortDateString() -
                     @ilan.BasvuruBitisTarihi.ToShortDateString()
                 </td>
-                <td>
+                <td class="text-center">
                     @if (ilan.Yayinda)
                     {
                         <span class="badge bg-success">Yayında</span>
@@ -63,6 +63,17 @@
                     </div>
                 </td>
             </tr>
+
+            
         }
+       
+      
     </tbody>
+
 </table>
+
+<div class="text-end">
+    <a class="btn btn-secondary mt-3" asp-controller="Admin" asp-action="Dashboard">
+        ⬅ Geri Dön
+    </a>
+</div>

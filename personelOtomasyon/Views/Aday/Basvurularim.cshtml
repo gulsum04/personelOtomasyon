@@ -39,37 +39,40 @@ else
                         <!-- 🧩 DURUM Hesaplama -->
                         <td>
                             @{
-                                string gosterilecekDurum = basvuru.Durum;
+                                string durumGosterilecek = basvuru.Durum;
 
-                                if (!string.IsNullOrEmpty(basvuru.JuriSonucu))
+                                if (string.IsNullOrEmpty(basvuru.YoneticiSonucu))
                                 {
-                                    if (basvuru.JuriSonucu == "Olumsuz")
-                                    {
-                                        gosterilecekDurum = "Reddedildi";
-                                    }
-                                    else if (basvuru.JuriSonucu == "Olumlu")
-                                    {
-                                        gosterilecekDurum = "Beklemede"; // Şu an için beklemede kalacak
-                                    }
+                                    // yönetici sonucu henüz belirlenmediyse başvuru beklemede görünür
+                                    durumGosterilecek = "Beklemede";
+                                }
+                                else if (basvuru.YoneticiSonucu == "Olumsuz")
+                                {
+                                    durumGosterilecek = "Reddedildi";
+                                }
+                                else if (basvuru.YoneticiSonucu == "Olumlu")
+                                {
+
+                                    durumGosterilecek = "Onaylandı";
                                 }
                             }
 
-                            @switch (gosterilecekDurum)
+                            @if (durumGosterilecek == "Reddedildi")
                             {
-                                case "Beklemede":
-                                    <span class="badge bg-warning">Beklemede</span>
-                                    break;
-                                case "Onaylandı":
-                                    <span class="badge bg-success">Onaylandı</span>
-                                    break;
-                                case "Reddedildi":
-                                    <span class="badge bg-danger">Reddedildi</span>
-                                    break;
-                                default:
-                                    <span class="badge bg-dark">@gosterilecekDurum</span>
-                                    break;
+                                <span class="badge bg-danger">
+                                    <span class="text-white">❌</span> Reddedildi
+                                </span>
+                            }
+                            else if (durumGosterilecek == "Onaylandı")
+                            {
+                                <span class="badge bg-success"> ✅ Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning"> 🕒 Beklemede</span>
                             }
                         </td>
+
 
                         <!-- 🧩 İŞLEMLER -->
                         <td>

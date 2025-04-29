@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
 using personelOtomasyon.Models;
 using System.Text.Json;
-using System.Linq;
 
 namespace personelOtomasyon.Controllers
 {
@@ -47,7 +46,7 @@ namespace personelOtomasyon.Controllers
         public async Task<IActionResult> YayinlananIlanlar()
         {
             var yayinlanmisIlanlar = await _context.AkademikIlanlar
-                .Where(i => i.Yayinda == true)
+                .Where(i => i.Yayinda)
                 .ToListAsync();
 
             return View(yayinlanmisIlanlar);
@@ -60,14 +59,14 @@ namespace personelOtomasyon.Controllers
             if (ilan == null)
             {
                 TempData["Error"] = "İlan bulunamadı.";
-                return RedirectToAction("YayinlananIlanlar");
+                return RedirectToAction(nameof(YayinlananIlanlar));
             }
 
             ilan.Yayinda = false;
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "İlan yayından kaldırıldı.";
-            return RedirectToAction("YayinlananIlanlar");
+            return RedirectToAction(nameof(YayinlananIlanlar));
         }
 
         // ✅ İlanı Yayına Al
@@ -77,14 +76,14 @@ namespace personelOtomasyon.Controllers
             if (ilan == null)
             {
                 TempData["Error"] = "İlan bulunamadı.";
-                return RedirectToAction("IlanListesi");
+                return RedirectToAction(nameof(IlanListesi));
             }
 
             ilan.Yayinda = true;
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "İlan yayına alındı.";
-            return RedirectToAction("IlanListesi");
+            return RedirectToAction(nameof(IlanListesi));
         }
 
         // 🧩 Kriter Belirle (GET)
@@ -99,7 +98,7 @@ namespace personelOtomasyon.Controllers
             if (ilan == null)
             {
                 TempData["Error"] = "İlan bulunamadı.";
-                return RedirectToAction("IlanListesi");
+                return RedirectToAction(nameof(IlanListesi));
             }
 
             return View(ilan);
@@ -107,17 +106,9 @@ namespace personelOtomasyon.Controllers
 
         // 🧩 Kriter Belirle (POST)
         [HttpPost]
-        public async Task<IActionResult> KriterBelirle(
-            int ilanId,
-            string TemelAlan,
-            string Unvan,
-            List<string> KriterAdlari,
-            List<string> Aciklamalar,
-            List<string> Zorunluluklar,
-            List<string> BelgeYuklenebilirlik,
-            List<string> Secilenler,
-            List<int> BelgeSayilari,
-            string AltBelgeJson)
+        public async Task<IActionResult> KriterBelirle(int ilanId, string TemelAlan, string Unvan,
+            List<string> KriterAdlari, List<string> Aciklamalar, List<string> Zorunluluklar,
+            List<string> BelgeYuklenebilirlik, List<string> Secilenler, List<int> BelgeSayilari, string AltBelgeJson)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -129,18 +120,16 @@ namespace personelOtomasyon.Controllers
             if (ilan == null)
             {
                 TempData["Error"] = "İlan bulunamadı.";
-                return RedirectToAction("IlanListesi");
+                return RedirectToAction(nameof(IlanListesi));
             }
 
             _context.KadroKriterAltlar.RemoveRange(ilan.KadroKriterleri.SelectMany(k => k.AltBelgeTurleri));
             _context.KadroKriterleri.RemoveRange(ilan.KadroKriterleri);
             await _context.SaveChangesAsync();
 
-            var altBelgeListesi = new List<KadroKriterAltDTO>();
-            if (!string.IsNullOrEmpty(AltBelgeJson))
-            {
-                altBelgeListesi = JsonSerializer.Deserialize<List<KadroKriterAltDTO>>(AltBelgeJson);
-            }
+            var altBelgeListesi = string.IsNullOrEmpty(AltBelgeJson)
+                ? new List<KadroKriterAltDTO>()
+                : JsonSerializer.Deserialize<List<KadroKriterAltDTO>>(AltBelgeJson);
 
             var yeniKriterler = new List<KadroKriteri>();
 
@@ -149,36 +138,21 @@ namespace personelOtomasyon.Controllers
                 if (!Secilenler.Contains(i.ToString()))
                     continue;
 
-                bool zorunluMu = Zorunluluklar.Contains(i.ToString());
-                bool belgeYuklenecekMi = BelgeYuklenebilirlik.Contains(i.ToString());
-
-                if (zorunluMu)
-                    belgeYuklenecekMi = true;
-
                 var kriter = new KadroKriteri
                 {
                     IlanId = ilanId,
                     KriterAdi = KriterAdlari[i],
                     Aciklama = Aciklamalar.Count > i ? Aciklamalar[i] : "Açıklama belirtilmedi",
-                    ZorunluMu = zorunluMu,
-                    BelgeYuklenecekMi = belgeYuklenecekMi,
+                    ZorunluMu = Zorunluluklar.Contains(i.ToString()),
+                    BelgeYuklenecekMi = BelgeYuklenebilirlik.Contains(i.ToString()),
                     BelgeSayisi = BelgeSayilari.Count > i ? BelgeSayilari[i] : 0,
                     TemelAlan = TemelAlan,
                     Unvan = Unvan,
                     KullaniciYoneticiId = user.Id,
-                    AltBelgeTurleri = new List<KadroKriterAlt>()
+                    AltBelgeTurleri = altBelgeListesi.Where(x => x.KriterIndex == i)
+                        .Select(x => new KadroKriterAlt { BelgeTuru = x.BelgeTuru, BelgeSayisi = x.BelgeSayisi })
+                        .ToList()
                 };
-
-                var altlar = altBelgeListesi.Where(x => x.KriterIndex == i).ToList();
-                foreach (var alt in altlar)
-                {
-                    kriter.AltBelgeTurleri.Add(new KadroKriterAlt
-                    {
-                        BelgeTuru = alt.BelgeTuru,
-                        BelgeSayisi = alt.BelgeSayisi,
-                        Kriter = kriter
-                    });
-                }
 
                 yeniKriterler.Add(kriter);
             }
@@ -194,7 +168,7 @@ namespace personelOtomasyon.Controllers
                 TempData["Error"] = "Herhangi bir kriter seçilmedi.";
             }
 
-            return RedirectToAction("KriterBelirle", new { id = ilanId });
+            return RedirectToAction(nameof(KriterBelirle), new { id = ilanId });
         }
 
         // 📄 Başvuruları Listele
@@ -205,7 +179,6 @@ namespace personelOtomasyon.Controllers
                 .Include(b => b.Aday)
                 .Include(b => b.DegerlendirmeRaporlari)
                     .ThenInclude(r => r.Juri)
-                .Where(b => b.DegerlendirmeRaporlari.Count == 1) // Sadece 5 jüri değerlendirmişse
                 .ToList();
 
             return View(basvurular);
@@ -227,28 +200,26 @@ namespace personelOtomasyon.Controllers
             return View(basvuru);
         }
 
-
-        // ✅ Final Karar Ver
+        // ✅ Yönetici Final Kararı
         [HttpPost]
         public IActionResult FinalKararVer(int id, string karar)
         {
-            var basvuru = _context.Basvurular
-                .FirstOrDefault(b => b.BasvuruId == id);
+            var basvuru = _context.Basvurular.FirstOrDefault(b => b.BasvuruId == id);
 
             if (basvuru == null)
             {
                 TempData["Error"] = "Başvuru bulunamadı.";
-                return RedirectToAction("Basvurular");
+                return RedirectToAction(nameof(Basvurular));
             }
 
             if (karar == "Olumlu")
             {
-                basvuru.JuriSonucu = "Olumlu";
+                basvuru.YoneticiSonucu = "Olumlu";
                 basvuru.Durum = "Onaylandı";
             }
             else if (karar == "Olumsuz")
             {
-                basvuru.JuriSonucu = "Olumsuz";
+                basvuru.YoneticiSonucu = "Olumsuz";
                 basvuru.Durum = "Reddedildi";
             }
 
@@ -258,10 +229,10 @@ namespace personelOtomasyon.Controllers
             _context.SaveChanges();
 
             TempData["Success"] = "Nihai karar başarıyla verildi.";
-            return RedirectToAction("Basvurular");
+            return RedirectToAction(nameof(Basvurular));
         }
 
-        // 📜 Belge Puanla (GET)
+        // 📥 Belge Puanla (GET)
         [HttpGet]
         public IActionResult BelgePuanla(int basvuruId)
         {
@@ -276,7 +247,7 @@ namespace personelOtomasyon.Controllers
 
             ViewBag.BasvuruId = basvuruId;
             ViewBag.IlanBasligi = basvuru.Ilan.Baslik;
-            ViewBag.JuriSonucu = basvuru.JuriSonucu; 
+            ViewBag.JuriSonucu = basvuru.JuriSonucu;
 
             var altKriterler = basvuru.Ilan.KadroKriterleri
                 .SelectMany(k => k.AltBelgeTurleri)
@@ -285,32 +256,32 @@ namespace personelOtomasyon.Controllers
             return View(altKriterler);
         }
 
-
-
-
-        // 📥 Belge Puanla Kaydet (POST)
         [HttpPost]
-        public async Task<IActionResult> BelgePuanlaKaydet(int basvuruId, List<string> kriterAdlari, List<string> aciklamalar, List<int> puanlar)
+        public async Task<IActionResult> BelgePuanlaKaydet(int basvuruId, List<string> kriterAdlari, List<string> aciklamalar, List<int> puanlar, string karar)
         {
             var user = await _userManager.GetUserAsync(User);
 
-            for (int i = 0; i < kriterAdlari.Count; i++)
+            // Eğer kriter listesi boş değilse belge puanlarını kaydet
+            if (kriterAdlari != null && kriterAdlari.Any())
             {
-                var puanKaydi = new BasvuruPuan
+                for (int i = 0; i < kriterAdlari.Count; i++)
                 {
-                    BasvuruId = basvuruId,
-                    BelgeTuru = kriterAdlari[i],
-                    FaaliyetAdi = aciklamalar[i],
-                    Puan = puanlar[i],
-                    YoneticiId = user.Id
-                };
+                    var puanKaydi = new BasvuruPuan
+                    {
+                        BasvuruId = basvuruId,
+                        BelgeTuru = kriterAdlari[i],
+                        FaaliyetAdi = (aciklamalar.Count > i) ? aciklamalar[i] : "", // Güvenli okuma ✅
+                        Puan = (puanlar.Count > i) ? puanlar[i] : 0,
+                        YoneticiId = user.Id
+                    };
 
-                _context.BasvuruPuanlar.Add(puanKaydi);
+                    _context.BasvuruPuanlar.Add(puanKaydi);
+                }
+
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-
-            // Toplam puanı güncelle
+            // ➡️ Toplam puanı hesapla (puan kaydedildiyse)
             var toplamPuan = _context.BasvuruPuanlar
                 .Where(x => x.BasvuruId == basvuruId)
                 .Sum(x => x.Puan);
@@ -319,12 +290,26 @@ namespace personelOtomasyon.Controllers
             if (basvuru != null)
             {
                 basvuru.ToplamPuan = toplamPuan;
+
+                if (karar == "Onayla")
+                {
+                    basvuru.YoneticiSonucu = "Olumlu";
+                    basvuru.Durum = "Onaylandı";
+                }
+                else if (karar == "Reddet")
+                {
+                    basvuru.YoneticiSonucu = "Olumsuz";
+                    basvuru.Durum = "Reddedildi";
+                }
+
+                basvuru.DegerlendirmeTamamlandiMi = true;
+
                 _context.Basvurular.Update(basvuru);
                 await _context.SaveChangesAsync();
             }
 
-            TempData["Success"] = "Puanlar başarıyla kaydedildi.";
-            return RedirectToAction("Basvurular");
+            TempData["Success"] = "Puanlar ve karar başarıyla kaydedildi.";
+            return RedirectToAction(nameof(Basvurular));
         }
 
 

@@ -37,33 +37,35 @@ else
                             @{
                                 string durumGosterilecek = basvuru.Durum;
 
-                                if (string.IsNullOrEmpty(basvuru.JuriSonucu))
+                                if (string.IsNullOrEmpty(basvuru.YoneticiSonucu))
                                 {
-                                    // Jüri sonucu henüz belirlenmediyse başvuru beklemede görünür
+                                    // yönetici sonucu henüz belirlenmediyse başvuru beklemede görünür
                                     durumGosterilecek = "Beklemede";
                                 }
-                                else if (basvuru.JuriSonucu == "Olumsuz")
+                                else if (basvuru.YoneticiSonucu == "Olumsuz")
                                 {
                                     durumGosterilecek = "Reddedildi";
                                 }
-                                else if (basvuru.JuriSonucu == "Olumlu")
+                                else if (basvuru.YoneticiSonucu == "Olumlu")
                                 {
-                                    // Olumluysa beklemede olarak devam (puanlama bekleniyor)
-                                    durumGosterilecek = "Beklemede";
+                                  
+                                    durumGosterilecek = "Onaylandı";
                                 }
                             }
 
                             @if (durumGosterilecek == "Reddedildi")
                             {
-                                <span class="badge bg-danger">Reddedildi</span>
+                                <span class="badge bg-danger">
+                                    <span class="text-white">❌</span> Reddedildi
+                                </span>
                             }
                             else if (durumGosterilecek == "Onaylandı")
                             {
-                                <span class="badge bg-success">Onaylandı</span>
+                                <span class="badge bg-success"> ✅ Onaylandı</span>
                             }
                             else
                             {
-                                <span class="badge bg-warning">Beklemede</span>
+                                <span class="badge bg-warning"> 🕒 Beklemede</span>
                             }
                         </td>
 
@@ -104,5 +106,11 @@ else
                 }
             </tbody>
         </table>
+
+        <div class="text-end mt-3">
+            <a class="btn btn-secondary" asp-action="Dashboard">
+                ⬅ Geri Dön
+            </a>
+        </div>
     </div>
 }
