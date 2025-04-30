@@ -12,7 +12,7 @@ Manuel olarak yürütülen akademik başvuru süreçleri;
 
 Bu sistem, **şeffaf, hızlı ve hatasız** bir başvuru süreci sağlamak amacıyla geliştirilmiştir.
 
-## 👥 Kullanıcı Rollerimiz
+## 👥 Kullanıcı Rolleri
 
 Sistem 4 ana kullanıcı rolü içerir:
 
