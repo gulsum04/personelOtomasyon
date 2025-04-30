@@ -1,4 +1,4 @@
-﻿@model List<personelOtomasyon.Models.KadroKriterAlt>
+﻿S@model List<personelOtomasyon.Models.KadroKriterAlt>
 
 @{
     ViewData["Title"] = "Belge Puanla";
@@ -25,6 +25,7 @@
                     <tr>
                         <td>
                             @Model[i].Kriter?.KriterAdi
+                           
                             <input type="hidden" name="kriterAdlari" value="@Model[i].Kriter?.KriterAdi" />
                         </td>
                         <td>
@@ -49,7 +50,7 @@
         <h4>Toplam Puan: <span id="toplamPuan">0</span></h4>
     </div>
 
-   
+
     <!-- 📍 Faaliyet Bazlı Sonuçlar -->
     <div class="mt-4">
         <div id="faaliyetDurumlari"></div> <!-- Her faaliyet için tek tek yazacak -->
@@ -74,7 +75,7 @@
                     <span class="text-warning">⚠️ Belirtilmedi</span>
                 }
 
-               
+
                 <a asp-action="JuriDegerlendirmeIncele" asp-route-id="@ViewBag.BasvuruId" class="btn btn-outline-primary btn-sm ms-3">
                     📄 Detay
                 </a>
@@ -85,7 +86,7 @@
                 <span class="text-warning">⚠️ Belirtilmedi</span>
             }
 
-           
+
         </h5>
     </div>
 
@@ -99,14 +100,7 @@
         </a>
     </div>
 
-
- 
-
-
-   
-
 </form>
-
 
 @section Scripts {
     <script>
@@ -272,6 +266,5 @@
 
     </script>
 }
-
 
 
