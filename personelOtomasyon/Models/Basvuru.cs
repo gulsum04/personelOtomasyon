@@ -32,6 +32,9 @@ namespace personelOtomasyon.Models
         public int? ToplamPuan { get; set; }
         public string? YoneticiSonucu { get; set; }
 
+        public ICollection<BasvuruPuan> BasvuruPuanlar { get; set; }
+
+
 
     }
 }

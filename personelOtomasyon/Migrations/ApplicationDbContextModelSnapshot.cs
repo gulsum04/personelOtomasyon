@@ -690,7 +690,7 @@ namespace personelOtomasyon.Migrations
             modelBuilder.Entity("personelOtomasyon.Models.BasvuruPuan", b =>
                 {
                     b.HasOne("personelOtomasyon.Models.Basvuru", "Basvuru")
-                        .WithMany()
+                        .WithMany("BasvuruPuanlar")
                         .HasForeignKey("BasvuruId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -801,6 +801,8 @@ namespace personelOtomasyon.Migrations
 
             modelBuilder.Entity("personelOtomasyon.Models.Basvuru", b =>
                 {
+                    b.Navigation("BasvuruPuanlar");
+
                     b.Navigation("Belgeler");
 
                     b.Navigation("DegerlendirmeRaporlari");

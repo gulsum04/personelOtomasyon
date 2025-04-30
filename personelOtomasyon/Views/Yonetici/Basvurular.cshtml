@@ -39,7 +39,6 @@ else
 
                                 if (string.IsNullOrEmpty(basvuru.YoneticiSonucu))
                                 {
-                                    // yönetici sonucu henüz belirlenmediyse başvuru beklemede görünür
                                     durumGosterilecek = "Beklemede";
                                 }
                                 else if (basvuru.YoneticiSonucu == "Olumsuz")
@@ -48,7 +47,6 @@ else
                                 }
                                 else if (basvuru.YoneticiSonucu == "Olumlu")
                                 {
-                                  
                                     durumGosterilecek = "Onaylandı";
                                 }
                             }
@@ -61,11 +59,11 @@ else
                             }
                             else if (durumGosterilecek == "Onaylandı")
                             {
-                                <span class="badge bg-success"> ✅ Onaylandı</span>
+                                <span class="badge bg-success">✅ Onaylandı</span>
                             }
                             else
                             {
-                                <span class="badge bg-warning"> 🕒 Beklemede</span>
+                                <span class="badge bg-warning">🕒 Beklemede</span>
                             }
                         </td>
 
@@ -83,23 +81,60 @@ else
                             }
                         </td>
 
+                  
                         <!-- 🧩 İŞLEMLER -->
-                        <td class="d-flex justify-content-center gap-2">
+                        <td class="d-flex justify-content-center flex-wrap gap-2">
                             <a asp-controller="Aday" asp-action="BasvuruDetay" asp-route-id="@basvuru.BasvuruId" class="btn btn-sm btn-primary">
                                 Detay
                             </a>
 
-                            @* Eğer jüri değerlendirme raporları geldiyse "İncele" butonu göster *@
                             @if (basvuru.DegerlendirmeRaporlari != null && basvuru.DegerlendirmeRaporlari.Any())
                             {
                                 <a asp-action="JuriDegerlendirmeIncele" asp-route-id="@basvuru.BasvuruId" class="btn btn-sm btn-info">
                                     Jüri İncele
                                 </a>
                             }
-                            <a asp-action="BelgePuanla" asp-route-basvuruId="@basvuru.BasvuruId" class="btn btn-warning btn-sm">
-                                📄 Belge Puanla
+
+                            <a asp-action="BelgePuanla" asp-route-basvuruId="@basvuru.BasvuruId" class="btn btn-sm btn-warning">
+                                📝 Değerlendir
                             </a>
 
+                               @if (!string.IsNullOrEmpty(basvuru.YoneticiSonucu))
+                            {
+                                <a asp-action="BelgePuanlaPdfTam"
+                                   asp-route-basvuruId="@basvuru.BasvuruId"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-success">
+                                    📄 PDF İndir
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-secondary disabled" tabindex="-1" aria-disabled="true">
+                                    📄 PDF İndir
+                                </a>
+                            } 
+
+
+                            @* PDF butonu: Yönetici değerlendirme yapıldıysa aktif, yapılmadıysa pasif BU GERCEKVMOLAN *@
+  
+                      
+                            @* @if (!string.IsNullOrEmpty(basvuru.YoneticiSonucu))
+                            {
+                                <a asp-action="BelgePuanlaPdfGercek"
+                                   asp-route-basvuruId="@basvuru.BasvuruId"
+                                   target="_blank"
+                                   class="btn btn-sm btn-outline-success">
+                                    📄 PDF İndir
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-secondary disabled" tabindex="-1" aria-disabled="true" title="Önce değerlendirme yapılmalı">
+                                    📄 PDF İndir
+                                </a>
+                            } *@  
+                           
                         </td>
 
                     </tr>

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
+using personelOtomasyon.Data.ViewModels;
 using personelOtomasyon.Models;
+using Rotativa.AspNetCore;
 using System.Text.Json;
 
 namespace personelOtomasyon.Controllers
@@ -257,11 +259,16 @@ namespace personelOtomasyon.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BelgePuanlaKaydet(int basvuruId, List<string> kriterAdlari, List<string> aciklamalar, List<int> puanlar, string karar)
+        public async Task<IActionResult> BelgePuanlaKaydet(
+            int basvuruId,
+            List<string> kriterAdlari,
+            List<string> belgeTurleri, 
+            List<string> aciklamalar,
+            List<int> puanlar,
+            string karar)
         {
             var user = await _userManager.GetUserAsync(User);
 
-            // Eğer kriter listesi boş değilse belge puanlarını kaydet
             if (kriterAdlari != null && kriterAdlari.Any())
             {
                 for (int i = 0; i < kriterAdlari.Count; i++)
@@ -269,8 +276,8 @@ namespace personelOtomasyon.Controllers
                     var puanKaydi = new BasvuruPuan
                     {
                         BasvuruId = basvuruId,
-                        BelgeTuru = kriterAdlari[i],
-                        FaaliyetAdi = (aciklamalar.Count > i) ? aciklamalar[i] : "", // Güvenli okuma ✅
+                        BelgeTuru = belgeTurleri[i], // ✅ ARTIK ALT KRİTER (örneğin: A1)
+                        FaaliyetAdi = (aciklamalar.Count > i) ? aciklamalar[i] : "",
                         Puan = (puanlar.Count > i) ? puanlar[i] : 0,
                         YoneticiId = user.Id
                     };
@@ -281,7 +288,7 @@ namespace personelOtomasyon.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // ➡️ Toplam puanı hesapla (puan kaydedildiyse)
+            // Toplam puanı hesapla
             var toplamPuan = _context.BasvuruPuanlar
                 .Where(x => x.BasvuruId == basvuruId)
                 .Sum(x => x.Puan);
@@ -290,18 +297,8 @@ namespace personelOtomasyon.Controllers
             if (basvuru != null)
             {
                 basvuru.ToplamPuan = toplamPuan;
-
-                if (karar == "Onayla")
-                {
-                    basvuru.YoneticiSonucu = "Olumlu";
-                    basvuru.Durum = "Onaylandı";
-                }
-                else if (karar == "Reddet")
-                {
-                    basvuru.YoneticiSonucu = "Olumsuz";
-                    basvuru.Durum = "Reddedildi";
-                }
-
+                basvuru.YoneticiSonucu = karar == "Onayla" ? "Olumlu" : "Olumsuz";
+                basvuru.Durum = karar == "Onayla" ? "Onaylandı" : "Reddedildi";
                 basvuru.DegerlendirmeTamamlandiMi = true;
 
                 _context.Basvurular.Update(basvuru);
@@ -313,6 +310,7 @@ namespace personelOtomasyon.Controllers
         }
 
 
+
         // DTO (Alt Belge için)
         private class KadroKriterAltDTO
         {
@@ -320,5 +318,99 @@ namespace personelOtomasyon.Controllers
             public string BelgeTuru { get; set; }
             public int BelgeSayisi { get; set; }
         }
+
+
+        [HttpGet]
+         public async Task<IActionResult> BelgePuanlaPdfTam(int basvuruId)
+         {
+             var basvuru = await _context.Basvurular
+                 .Include(b => b.Ilan)
+                     .ThenInclude(i => i.KadroKriterleri)
+                         .ThenInclude(k => k.AltBelgeTurleri)
+                 .Include(b => b.Aday)
+                 .FirstOrDefaultAsync(b => b.BasvuruId == basvuruId);
+
+             if (basvuru == null)
+                 return NotFound();
+
+             var altKriterler = basvuru.Ilan.KadroKriterleri
+                 .SelectMany(k => k.AltBelgeTurleri)
+                 .ToList();
+
+             var puanSozluk = new Dictionary<string, int> {
+         {"A1", 60}, {"A2", 50}, {"A3", 40},
+         {"B1", 20}, {"B2", 10},
+         {"C1", 50}, {"C2", 40},
+         {"D. Atıflar", 40},
+         {"E. Eğitim-Öğretim Faaliyetleri", 20},
+         {"F. Tez Yöneticiliği", 20},
+         {"G. Patentler", 40},
+         {"I. Editörlük/Yayın Kurulu/Hakemlik", 30},
+         {"J. Ödüller", 25},
+         {"K. İdari Görevler ve Üniversiteye Katkı", 15},
+         {"L. Güzel Sanatlar Faaliyetleri", 20}
+     };
+
+             int toplamPuan = altKriterler.Sum(x =>
+                 puanSozluk.TryGetValue(x.BelgeTuru ?? "", out int p) ? p : 0
+             );
+
+             var model = new Tablo5PuanlamaVM
+             {
+                 IlanBaslik = basvuru.Ilan.Baslik,
+                 AdayAdSoyad = basvuru.Aday.FullName,
+                 ToplamPuan = toplamPuan,
+                 AltKriterler = altKriterler,
+                 PuanSozluk = puanSozluk
+             };
+
+             return new ViewAsPdf("Tablo5Pdf", model)
+             {
+                 FileName = "BelgePuanlamaRaporu.pdf",
+                 PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
+             };
+         }
+
+   
+
+
+        /* ADI GERCEK OLAN [HttpGet]
+         public async Task<IActionResult> BelgePuanlaPdfGercek(int basvuruId)
+         {
+             var basvuru = await _context.Basvurular
+                 .Include(b => b.Ilan)
+                 .Include(b => b.Aday)
+                 .FirstOrDefaultAsync(b => b.BasvuruId == basvuruId);
+
+             if (basvuru == null)
+                 return NotFound();
+
+             // Adayın yüklediği ve yönetici tarafından puanlanan belgeleri al
+             var puanlar = await _context.BasvuruPuanlar
+                 .Where(p => p.BasvuruId == basvuruId)
+                 .ToListAsync();
+
+             var toplamPuan = puanlar.Sum(p => p.Puan);
+
+             var model = new Tablo5GercekPuanlamaVM
+             {
+                 IlanBaslik = basvuru.Ilan.Baslik,
+                 AdayAdSoyad = basvuru.Aday.FullName,
+                 ToplamPuan = toplamPuan,
+                 Puanlar = puanlar
+             };
+
+             return new ViewAsPdf("Tablo5PdfGercek", model)
+             {
+                 FileName = "BelgePuanlamaRaporu-Gercek.pdf",
+                 PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
+             };
+         }*/
+
+
+
+
     }
 }

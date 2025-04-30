@@ -21,6 +21,7 @@ namespace personelOtomasyon.Data
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
+        
         {
             base.OnModelCreating(modelBuilder);
 
@@ -75,6 +76,16 @@ namespace personelOtomasyon.Data
                 .OnDelete(DeleteBehavior.Cascade); // İlan silinirse kriterleri de silinsin
 
 
+            modelBuilder.Entity<BasvuruPuan>()
+    .HasOne(p => p.Basvuru)
+    .WithMany(b => b.BasvuruPuanlar)
+    .HasForeignKey(p => p.BasvuruId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+
         }
+
+
+
     }
 }

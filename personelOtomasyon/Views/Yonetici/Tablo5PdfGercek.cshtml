@@ -1,0 +1,97 @@
+﻿@model personelOtomasyon.Data.ViewModels.Tablo5GercekPuanlamaVM
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Belge Puanlama Raporu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            margin: 40px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+        }
+
+        .info-box {
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .total-box {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid #2c3e50;
+            background-color: #eaf2f8;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>Belge Puanlama Raporu</h2>
+
+    <div class="info-box">
+        <p><strong>İlan Başlığı:</strong> @Model.IlanBaslik</p>
+        <p><strong>Aday Ad Soyad:</strong> @Model.AdayAdSoyad</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Belge Türü</th>
+                <th>Faaliyet Adı</th>
+                <th>Puan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Puanlar)
+            {
+                <tr>
+                    <td>@item.BelgeTuru</td>
+                    <td>@item.FaaliyetAdi</td>
+                    <td>@item.Puan</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="total-box">
+        Toplam Puan: @Model.ToplamPuan
+    </div>
+</body>
+</html>
