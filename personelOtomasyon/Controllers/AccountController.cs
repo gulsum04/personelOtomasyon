@@ -88,6 +88,36 @@ namespace personelOtomasyon.Controllers
             return View(users);
         }
 
+
+        // ✅ KPS Web Servisi ile T.C. Kimlik Doğrulama
+        /*try
+        {
+            var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
+
+            // Ad ve Soyad'ı ayır
+            var ad = registerVM.FullName.Split(" ")[0].ToUpper();
+            var soyad = registerVM.FullName.Split(" ")[^1].ToUpper();
+
+            var kpsResult = await client.TCKimlikNoDogrulaAsync(
+                long.Parse(registerVM.TcKimlikNo),
+                ad,
+                soyad,
+                registerVM.DogumYili
+            );
+
+            if (!kpsResult.Body.TCKimlikNoDogrulaResult)
+            {
+                TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
+                return View(registerVM);
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
+            return View(registerVM);
+        }*/
+
+
         // ---------- LOGIN GET ----------
         [HttpGet]
         public IActionResult Login(string role)
@@ -162,6 +192,7 @@ namespace personelOtomasyon.Controllers
                 return View(registerVM);
             }
 
+            //service doğrulama 
             try
             {
                 var ad = registerVM.FullName.Split(" ")[0].ToUpper();
@@ -230,7 +261,7 @@ namespace personelOtomasyon.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync(); // ✅ Sadece çıkış yapılıyor
+            await _signInManager.SignOutAsync(); //  Sadece çıkış yapılıyor
             TempData.Clear(); // Kullanıcıya ait mesajları temizle
             return RedirectToAction("Index", "Home");
         }
