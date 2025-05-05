@@ -1,0 +1,150 @@
+﻿@model personelOtomasyon.Models.AkademikIlan
+
+@{
+    ViewData["Title"] = "İlan Detayı";
+}
+
+<h2 class="mb-4">@Model.Baslik İlan Detayı</h2>
+<hr />
+
+<!-- 📋 İlan Genel Bilgileri -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        📋 İlan Bilgileri
+    </div>
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Başlık:</div>
+            <div class="col-sm-9">@Model.Baslik</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Temel Alan:</div>
+            <div class="col-sm-9">@Model.TemelAlan</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Kategori:</div>
+            <div class="col-sm-9">@Model.Kategori</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Başvuru Tarihleri:</div>
+            <div class="col-sm-9">@Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-sm-3 fw-bold">Açıklama:</div>
+            <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.Aciklama) ? Model.Aciklama : "Açıklama belirtilmedi.")</div>
+        </div>
+    </div>
+</div>
+
+<!-- 🧾 Kadro Kriterleri -->
+@if (Model.KadroKriterleri != null && Model.KadroKriterleri.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            🧾 Kadro Kriterleri
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="kriterAccordion">
+                @foreach (var kriter in Model.KadroKriterleri)
+                {
+                    var kriterId = kriter.KriterId;
+                    <div class="accordion-item mb-2">
+                        <h2 class="accordion-header" id="heading-@kriterId">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@kriterId" aria-expanded="false" aria-controls="collapse-@kriterId">
+                                📌 @kriter.KriterAdi
+                            </button>
+                        </h2>
+                        <div id="collapse-@kriterId" class="accordion-collapse collapse" aria-labelledby="heading-@kriterId">
+                            <div class="accordion-body">
+                                <p><strong>Açıklama:</strong> @(string.IsNullOrEmpty(kriter.Aciklama) ? "Açıklama belirtilmedi." : kriter.Aciklama)</p>
+                                <p><strong>Zorunlu mu?:</strong> @(kriter.ZorunluMu ? "Evet" : "Hayır")</p>
+                                <p><strong>Belge Yüklenecek mi?:</strong> @(kriter.BelgeYuklenecekMi ? "Evet" : "Hayır")</p>
+
+                                @if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
+                                {
+                                    <div class="mt-3">
+                                        <h6>Alt Belge Türleri:</h6>
+                                        <ul class="list-group">
+                                            @foreach (var alt in kriter.AltBelgeTurleri)
+                                            {
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    @alt.BelgeTuru
+                                                    <span class="badge bg-info rounded-pill">@alt.BelgeSayisi belge</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="mt-2"><em>Belirli bir alt belge türü tanımlanmamış.</em></p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Bu ilana ait kadro kriteri tanımlanmamış.
+    </div>
+}
+
+<!-- 🔗 Butonlar -->
+<div class="d-flex justify-content-between mt-4">
+
+    @if (Model.Yayinda)
+    {
+        if (ViewBag.BasvurduMu == true)
+        {
+            <!-- Başvuru yapıldıysa: Modal açacak buton -->
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#basvuruModal" style="opacity: 0.6;">
+                Başvur
+            </button>
+        }
+        else
+        {
+            <!-- Henüz başvurmadıysa: Normal başvuru linki -->
+            <a asp-action="Basvur" asp-route-id="@Model.IlanId" class="btn btn-primary">
+                Başvur
+            </a>
+        }
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">
+        ⬅ Yayındaki İlanlara Dön
+    </a>
+</div>
+
+<!-- Başvuru Yapıldı Modalı -->
+<div class="modal fade" id="basvuruModal" tabindex="-1" aria-labelledby="basvuruModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="basvuruModalLabel">Başvuru Durumu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem; color: orange;"></i>
+                <p class="mt-3 mb-0 fs-5">Bu ilana zaten başvurdunuz!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var myModal = document.getElementById('basvuruModal');
+        myModal.addEventListener('shown.bs.modal', function () {
+            setTimeout(function () {
+                var modalInstance = bootstrap.Modal.getInstance(myModal);
+                modalInstance.hide();
+            }, 2000);
+        });
+    </script>
+}

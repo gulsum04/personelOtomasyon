@@ -15,5 +15,7 @@ namespace personelOtomasyon.Models
 
         public string BelgeTuru { get; set; }
         public int BelgeSayisi { get; set; }
+
+
     }
 }

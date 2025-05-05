@@ -1,24 +1,94 @@
 ﻿@model personelOtomasyon.Models.AkademikIlan
 
-<h2>@Model.Baslik</h2>
-<p><strong>Kategori:</strong> @Model.Kategori</p>
-<p><strong>Açıklama:</strong>@Model.Aciklama</p>
-<p><strong>Başvuru Tarihleri:</strong> @Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</p>
+@{
+    ViewData["Title"] = "İlana Başvuru Yap";
+}
 
+<h2 class="mb-4">@Model.Baslik Başvurusu</h2>
 <hr />
 
-<form asp-action="BasvuruYap" method="post" enctype="multipart/form-data">
+<form asp-action="BasvuruYap" method="post" enctype="multipart/form-data" id="basvuruForm">
     <input type="hidden" name="ilanId" value="@Model.IlanId" />
 
-    <div class="form-group">
-        <label>Belge Adı</label>
-        <input type="text" name="belgeTuru" class="form-control" required />
-    </div>
+    @foreach (var kriter in Model.KadroKriterleri)
+    {
+        if (kriter.BelgeYuklenecekMi || kriter.ZorunluMu)
+        {
+            <div class="mb-4 p-3 border rounded">
+                <h5 class="fw-bold">@kriter.KriterAdi</h5>
 
-    <div class="form-group">
-        <label>Dosya Seç</label>
-        <input type="file" name="belge" class="form-control" required />
-    </div>
+                <p>@(string.IsNullOrEmpty(kriter.Aciklama) ? "Açıklama belirtilmedi." : kriter.Aciklama)</p>
 
-    <button type="submit" class="btn btn-primary">Başvuruyu Gönder</button>
+                @if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
+                {
+                    <div class="alert alert-info p-2">
+                        <strong>Yükleme Talimatı:</strong>
+                        @foreach (var alt in kriter.AltBelgeTurleri)
+                        {
+                            <div>
+                                - <strong>@alt.BelgeTuru:</strong> @alt.BelgeSayisi adet belge yükleyin.
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-secondary p-2">
+                        Bu kriter için belirli bir belge türü yok. Genel belge yüklemeniz bekleniyor.
+                    </div>
+                }
+
+                <div class="upload-area" data-kriter-id="@kriter.KriterId">
+                    @if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
+                    {
+                        foreach (var alt in kriter.AltBelgeTurleri)
+                        {
+                            for (int i = 0; i < alt.BelgeSayisi; i++)
+                            {
+                                <div class="input-group mb-2 belge-row">
+                                    <input type="file" name="belgeler" class="form-control" onchange="toggleClearButton(this)" required />
+                                    <input type="hidden" name="belgeTurleri" value="@alt.BelgeTuru" />
+                                    <button type="button" class="btn btn-danger btn-sm ms-2 clear-file" style="display:none;" onclick="clearFile(this)">❌</button>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="input-group mb-2 belge-row">
+                            <input type="file" name="belgeler" class="form-control" onchange="toggleClearButton(this)" required />
+                            <input type="hidden" name="belgeTurleri" value="@kriter.KriterAdi" />
+                            <button type="button" class="btn btn-danger btn-sm ms-2 clear-file" style="display:none;" onclick="clearFile(this)">❌</button>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        }
+    }
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-success">Başvuruyu Gönder</button>
+    </div>
 </form>
+
+@section Scripts {
+    <script>
+        // Seçilen dosyayı temizle
+        function clearFile(button) {
+            const input = button.previousElementSibling.previousElementSibling;
+            input.value = ""; // dosyayı sıfırla
+            button.style.display = "none"; // butonu gizle
+        }
+
+        // Dosya seçilince clear butonu aktif olsun
+        function toggleClearButton(input) {
+            const clearBtn = input.nextElementSibling.nextElementSibling;
+            if (input.files.length > 0) {
+                clearBtn.style.display = "inline-block";
+            } else {
+                clearBtn.style.display = "none";
+            }
+        }
+    </script>
+}

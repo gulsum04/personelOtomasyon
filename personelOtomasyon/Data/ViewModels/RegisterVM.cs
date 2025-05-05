@@ -19,6 +19,10 @@ namespace personelOtomasyon.Data.ViewModels
         [Range(1900, 2100, ErrorMessage = "Geçerli bir yıl giriniz!")]
         public int DogumYili { get; set; }
 
+        [Display(Name = "E-Posta Adresi")]
+        [Required(ErrorMessage = "E-Posta adresi giriniz!")]
+        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz!")]
+        public string Email { get; set; }
 
         [Display(Name = "Şifre")]
         [Required(ErrorMessage = "Şifre giriniz!")]

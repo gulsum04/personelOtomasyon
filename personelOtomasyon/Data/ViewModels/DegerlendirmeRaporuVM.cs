@@ -4,7 +4,7 @@ namespace personelOtomasyon.Data.ViewModels
 {
     public class DegerlendirmeRaporuVM
     {
-        public int RaporId { get; set; }  // ✅ Bu şart güncelleme için
+        public int RaporId { get; set; }  
 
         [Required]
         public int BasvuruId { get; set; }

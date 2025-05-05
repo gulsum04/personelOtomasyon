@@ -1,0 +1,51 @@
+﻿@model personelOtomasyon.Models.Basvuru
+
+<h2 class="mb-4">📋 Jüri Değerlendirmeleri</h2>
+
+<div class="mb-4">
+    <h4>İlan Başlığı: <span class="text-primary">@Model.Ilan?.Baslik</span></h4>
+    <h5>Aday Id: <span class="text-secondary">@Model.KullaniciAdayId</span></h5>
+    @* <h5>Aday Adı: <span class="text-secondary">@Model.Aday?.FullName</span></h5>*@
+
+</div>
+
+@if (Model.DegerlendirmeRaporlari != null && Model.DegerlendirmeRaporlari.Any())
+{
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-hover text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Jüri Üyesi</th>
+                    <th>Sonuç</th>
+                    <th>Rapor Özeti</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rapor in Model.DegerlendirmeRaporlari)
+                {
+                    <tr>
+                        <td>@rapor.Juri?.FullName</td>
+                        <td>
+                            <span class="badge @(rapor.Sonuc == "Olumlu" ? "bg-success" : "bg-danger")">
+                                @rapor.Sonuc
+                            </span>
+                        </td>
+                        <td>
+                            @(rapor.RaporDosyasi.Length > 100 ? rapor.RaporDosyasi.Substring(0, 100) + "..." : rapor.RaporDosyasi)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">Henüz jüri değerlendirmesi bulunmamaktadır.</div>
+}
+
+<div class="text-end mt-3">
+    <a class="btn btn-secondary" asp-action="Basvurular">
+        ⬅ Geri Dön
+    </a>
+</div>

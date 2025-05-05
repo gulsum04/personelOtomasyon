@@ -4,23 +4,42 @@
 
 <h2 class="mb-4">📊 Yönetici Kontrol Paneli</h2>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card border-primary mb-4">
-            <div class="card-body">
+<div class="row g-4">
+    <!-- Tüm İlanlar -->
+    <div class="col-md-4">
+        <div class="card border-primary h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
                 <h5 class="card-title">📋 Tüm İlanlar</h5>
-                <p class="card-text">Yayına alınacak, kriter belirlenecek veya yayınlanan ilanları yönet.</p>
-                <a asp-action="IlanListesi" asp-controller="Yonetici" class="btn btn-primary">İlanları Yönet</a>
+                <p class="card-text flex-grow-1">
+                    Yayına alınacak, kriter belirlenecek veya yayınlanan ilanları yönetin.
+                </p>
+                <a asp-action="IlanListesi" asp-controller="Yonetici" class="btn btn-primary mt-auto">İlanları Yönet</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card border-success mb-4">
-            <div class="card-body">
+    <!-- Yayındaki İlanlar -->
+    <div class="col-md-4">
+        <div class="card border-success h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
                 <h5 class="card-title">📢 Yayındaki İlanlar</h5>
-                <p class="card-text">Adayların erişebildiği aktif ilanları görüntüle.</p>
-                <a asp-action="YayinlananIlanlar" asp-controller="Yonetici" class="btn btn-success">Yayınlananlar</a>
+                <p class="card-text flex-grow-1">
+                    Adayların erişebildiği aktif ilanları görüntüleyin.
+                </p>
+                <a asp-action="YayinlananIlanlar" asp-controller="Yonetici" class="btn btn-success mt-auto">Yayınlananlar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Başvurular -->
+    <div class="col-md-4">
+        <div class="card border-warning h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">📝 Başvurular</h5>
+                <p class="card-text flex-grow-1">
+                    Başvuruları görüntüleyin ve jüri değerlendirmelerini inceleyin.
+                </p>
+                <a asp-action="Basvurular" asp-controller="Yonetici" class="btn btn-warning text-white mt-auto">Başvurular</a>
             </div>
         </div>
     </div>

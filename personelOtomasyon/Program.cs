@@ -3,6 +3,7 @@ using personelOtomasyon.Data;
 using Microsoft.AspNetCore.Identity;
 using personelOtomasyon.Models;
 using personelOtomasyon.Connected_Services.KpsService;
+using personelOtomasyon.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddScoped<IKpsService, MockKpsService>();
 
 builder.Services.AddControllersWithViews();
-
 var app = builder.Build();
+
+
 
 //  ROL EKLEME BLOĞU (Admin ve User rolleri oluşturulur)
 using (var scope = app.Services.CreateScope())
@@ -39,6 +41,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+Rotativa.AspNetCore.RotativaConfiguration.Setup(builder.Environment.WebRootPath, "Rotativa");
 
 app.UseRouting();
 
@@ -75,7 +79,7 @@ using (var scope = app.Services.CreateScope())
     {
         var newAdmin = new ApplicationUser
         {
-            FullName = "Sistem Yöneticisi",
+            FullName = "Sistem Admini",
             TcKimlikNo = adminTc,
             UserName = adminTc,
             Email = adminEmail,

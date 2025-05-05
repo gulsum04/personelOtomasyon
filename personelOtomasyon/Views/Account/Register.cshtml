@@ -34,10 +34,15 @@
 
                     <div class="form-group">
                         <label asp-for="DogumYili" class="control-label"></label>
-                        <input asp-for="DogumYili" class="form-control" />
+                        <input asp-for="DogumYili" class="form-control" type="number" min="1900" />
                         <span asp-validation-for="DogumYili" class="text-danger"></span>
                     </div>
 
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
 
                     <div class="form-group">
                         <label asp-for="Password" class="control-label"></label>
@@ -51,7 +56,7 @@
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group d-flex justify-content-between">
+                    <div class="form-group d-flex justify-content-between mt-4">
                         <input class="btn btn-outline-success" type="submit" value="Kaydol" />
                         <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Geri</a>
                     </div>

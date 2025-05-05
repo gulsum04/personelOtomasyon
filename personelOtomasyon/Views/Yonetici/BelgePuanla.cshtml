@@ -1,0 +1,270 @@
+﻿@model List<personelOtomasyon.Models.KadroKriterAlt>
+
+@{
+    ViewData["Title"] = "Belge Puanla";
+}
+
+<h2 class="mb-4">@ViewBag.IlanBasligi - Puanlama</h2>
+
+<form asp-action="BelgePuanlaKaydet" method="post">
+    <input type="hidden" name="basvuruId" value="@ViewBag.BasvuruId" />
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Ana Kriter Adı</th>
+                    <th>Alt Kriter Adı (Belge Türü)</th>
+                    <th>Belge Sayısı</th>
+                    <th>Puan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Model[i].Kriter?.KriterAdi
+                           
+                            <input type="hidden" name="kriterAdlari" value="@Model[i].Kriter?.KriterAdi" />
+                        </td>
+                        <td>
+                            @Model[i].BelgeTuru
+                            <input type="hidden" name="belgeTurleri" value="@Model[i].BelgeTuru" />
+                        </td>
+                        <td>
+                            @Model[i].BelgeSayisi
+                            <input type="hidden" name="belgeSayilari" value="@Model[i].BelgeSayisi" />
+                        </td>
+                        <td>
+                            <input type="number" name="puanlar" class="form-control" placeholder="Puan" required readonly />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 📍 Tablo BİTTİKTEN SONRA toplam puan gösterimi -->
+    <div class="mt-4 text-end">
+        <h4>Toplam Puan: <span id="toplamPuan">0</span></h4>
+    </div>
+
+
+    <!-- 📍 Faaliyet Bazlı Sonuçlar -->
+    <div class="mt-4">
+        <div id="faaliyetDurumlari"></div> <!-- Her faaliyet için tek tek yazacak -->
+        <div id="genelDurum"></div> <!-- Genel başarılı/başarısız durumu -->
+    </div>
+
+    <div class="mt-4">
+        <h5>
+            Jüri Sonucu:
+            @if (ViewBag.JuriSonucu != null)
+            {
+                if (ViewBag.JuriSonucu == "Olumlu")
+                {
+                    <span class="text-success">✅ Olumlu</span>
+                }
+                else if (ViewBag.JuriSonucu == "Olumsuz")
+                {
+                    <span class="text-danger">❌ Olumsuz</span>
+                }
+                else
+                {
+                    <span class="text-warning">⚠️ Belirtilmedi</span>
+                }
+
+
+                <a asp-action="JuriDegerlendirmeIncele" asp-route-id="@ViewBag.BasvuruId" class="btn btn-outline-primary btn-sm ms-3">
+                    📄 Detay
+                </a>
+
+            }
+            else
+            {
+                <span class="text-warning">⚠️ Belirtilmedi</span>
+            }
+
+
+        </h5>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <div class="d-flex gap-2">
+            <button type="submit" name="karar" value="Onayla" class="btn btn-success">Onayla</button>
+            <button type="submit" name="karar" value="Reddet" class="btn btn-danger">Reddet</button>
+        </div>
+        <a class="btn btn-secondary" asp-action="Basvurular">
+            ⬅ Geri Dön
+        </a>
+    </div>
+
+</form>
+
+@section Scripts {
+    <script>
+        const kriterPuanlari = {
+            "A1": 60,
+            "A2": 50,
+            "A3": 40,
+            "A. Makaleler": 50,
+            "B1": 20,
+            "B2": 10,
+            "B. Bilimsel Toplantı Faaliyetleri": 30,
+            "C1": 50,
+            "C2": 40,
+            "C. Kitaplar": 60,
+            "D. Atıflar": 40,
+            "E. Eğitim-Öğretim Faaliyetleri": 20,
+            "F. Tez Yöneticiliği": 20,
+            "G. Patentler": 40,
+            "I. Editörlük/Yayın Kurulu/Hakemlik": 30,
+            "J. Ödüller": 25,
+            "K. İdari Görevler ve Üniversiteye Katkı": 15,
+            "L. Güzel Sanatlar Faaliyetleri": 20
+        };
+
+                const faaliyetGruplari = {
+            "A1-A4": {
+                kriterler: ["A1", "A2", "A3", "A4"],
+                asgariPuan: 45
+            },
+            "A1-A5": {
+                kriterler: ["A5"],
+                asgariPuan: 5
+            },
+            "A1-A6": {
+                kriterler: ["A6"],
+                asgariPuan: 5
+            },
+            "D1-D6": {
+                kriterler: ["D1", "D2", "D3", "D4", "D5", "D6"],
+                asgariPuan: 10
+            },
+            "E1-E2": {
+                kriterler: ["E1", "E2"],
+                asgariPuan: 50
+            },
+            "F1-F2": {
+                kriterler: ["F1", "F2"],
+                asgariPuan: 50
+            },
+            "H1-H7": {
+                kriterler: ["H1", "H2", "H3", "H4", "H5", "H6", "H7"],
+                asgariPuan: 5
+            },
+            "H1-H22": {
+                kriterler: ["H8", "H9", "H10", "H11", "H12", "H13", "H14", "H15", "H16", "H17", "H18", "H19", "H20", "H21", "H22"],
+                asgariPuan: 5
+            },
+            "K1-K11": {
+                kriterler: ["K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "K11"],
+                asgariPuan: 5
+            }
+        };
+
+
+        function toplamPuanHesapla() {
+            const puanlar = document.querySelectorAll('input[name="puanlar"]');
+            let toplam = 0;
+            puanlar.forEach(puanInput => {
+                const deger = parseInt(puanInput.value);
+                if (!isNaN(deger)) {
+                    toplam += deger;
+                }
+            });
+            document.getElementById('toplamPuan').innerText = toplam;
+        }
+
+           function faaliyetBazliKontrol() {
+            const belgeTurleri = document.querySelectorAll('input[name="belgeTurleri"]');
+            const puanlar = document.querySelectorAll('input[name="puanlar"]');
+
+            let grupSonuclari = {};
+
+            // Her grup için toplamı başlat
+            for (const grup in faaliyetGruplari) {
+                grupSonuclari[grup] = 0;
+            }
+
+            // Belge türlerine göre puanları topla
+            belgeTurleri.forEach((input, index) => {
+                const belgeTuru = input.value.trim();
+                const puan = parseInt(puanlar[index].value) || 0;
+
+                for (const grup in faaliyetGruplari) {
+                    if (faaliyetGruplari[grup].kriterler.includes(belgeTuru)) {
+                        grupSonuclari[grup] += puan;
+                    }
+                }
+            });
+
+            // Sonuçları yaz
+            let genelDurum = true;
+            let detayHtml = "";
+
+            for (const grup in grupSonuclari) {
+                const toplam = grupSonuclari[grup];
+                const asgari = faaliyetGruplari[grup].asgariPuan;
+
+                if (toplam === 0) {
+                    // Eğer bu grupta hiç belge yoksa, bu grubu kontrol etmeden atla
+                    continue;
+                }
+
+                if (toplam >= asgari) {
+                    detayHtml += `<div><strong>${grup}:</strong> <span class="text-success">✅ Geçti</span> (Puan: ${toplam})</div>`;
+                } else {
+                    detayHtml +=`<div><strong>${grup}:</strong> <span class="text-danger">❌ Geçemedi</span> (Puan: ${toplam})</div>`;
+                    genelDurum = false;
+                }
+            }
+
+            // Detayları yaz
+            document.getElementById('faaliyetDurumlari').innerHTML = detayHtml;
+
+            // Genel Sonuç
+            const genelDurumElement = document.getElementById('genelDurum');
+            if (genelDurum) {
+                genelDurumElement.innerHTML = `<h5 class='mt-3'>✅ Tüm Yüklenen Kriterlerin Asgari Şartları <span class="text-success">Sağlandı!</span></h5>`;
+                document.getElementById('onayRedButonlari').style.display = "block";
+            } else {
+                genelDurumElement.innerHTML =  `<h5 class='mt-3'>❌ Bazı Yüklenen Kriterlerde Asgari Şart <span class="text-danger">Sağlanamadı!</span></h5>`;
+                document.getElementById('onayRedButonlari').style.display = "block";
+            }
+        }
+
+
+
+              document.addEventListener('DOMContentLoaded', function () {
+            const belgeTurleri = document.querySelectorAll('input[name="belgeTurleri"]');
+            const puanlar = document.querySelectorAll('input[name="puanlar"]');
+
+            belgeTurleri.forEach((input, index) => {
+                const belgeTuru = input.value.trim();
+                if (kriterPuanlari[belgeTuru] !== undefined) {
+                    puanlar[index].value = kriterPuanlari[belgeTuru];
+                }
+                else {
+                    puanlar[index].value = 0;
+                }
+            });
+
+            // İlk yüklemede toplam puanı ve faaliyet bazlı durumu hesapla
+            toplamPuanHesapla();
+            faaliyetBazliKontrol();
+
+            // Puan değişince her ikisini tekrar hesapla
+            puanlar.forEach(puanInput => {
+                puanInput.addEventListener('input', function () {
+                    toplamPuanHesapla();
+                    faaliyetBazliKontrol();
+                });
+            });
+        });
+
+    </script>
+}
+
+

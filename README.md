@@ -12,7 +12,7 @@ Manuel olarak yürütülen akademik başvuru süreçleri;
 
 Bu sistem, **şeffaf, hızlı ve hatasız** bir başvuru süreci sağlamak amacıyla geliştirilmiştir.
 
-## 👥 Kullanıcı Rollerimiz
+## 👥 Kullanıcı Rolleri
 
 Sistem 4 ana kullanıcı rolü içerir:
 
@@ -75,6 +75,50 @@ Yönetici, nihai sonucu belirler.
 
 
 ## 
+
+Yeni Kullanıcı Kaydı Oluşturma Sayfası  
+![Image](https://github.com/user-attachments/assets/30f6e357-3d69-4d66-9b0f-baad625ac122)  
+#
+
+Panellere Giriş Sayfası  
+![Image](https://github.com/user-attachments/assets/94813bee-7386-45e8-bbba-6fae25594e28)  
+#
+
+Kullanıcı Hesap Girişi Sayfası  
+![Image](https://github.com/user-attachments/assets/1ef4c014-111b-48dc-a34e-c256827b9600)  
+#
+
+Aday Paneli Yayındaki İlanları Görüntüleme Sayfası  
+![Image](https://github.com/user-attachments/assets/db573779-afce-4865-8b5b-cd55b54737c1)  
+#
+
+Aday İçan Başvuracağı İlan Detayları Sayfası  
+![Image](https://github.com/user-attachments/assets/d45f84d6-02ef-4fdd-b28c-b4b5a4e80d22)  
+#
+
+Admin Panelinin Kullanıcı Tür Ataması Yaptığı Sayfa  
+![Image](https://github.com/user-attachments/assets/81a4bc4f-fa98-4254-8350-472c1534f742)  
+#
+
+Yönetici Panelinde Mevcut İlanlara Kriter Belirleme-Güncelleme Ve İlana Alma Sayfası  
+![Image](https://github.com/user-attachments/assets/9fdc6690-1fdb-49a2-94f5-78dd3dab5739)  
+#
+
+Yönetici Panelinde Başvuruların Yönetici Tarafından Nihai Karar Verme Sayfası  
+![Image](https://github.com/user-attachments/assets/83ab0628-eb98-4b73-b6d7-4c6afae77fcd)  
+#
+
+Admin Panelinde Yeni İlan Oluşturma Sayfası  
+![Image](https://github.com/user-attachments/assets/b164a2da-7512-4806-a2c2-4733d52ec499)  
+#
+
+Kullanıcılara Gelen Kullunacı Tür Ataması Ve Yeni İlan Bildirim Sayfası  
+![Image](https://github.com/user-attachments/assets/60aeaa3c-befe-4dca-bf9b-e173d4fb555b)  
+#
+
+Yönetici Paneli İlanlara Kriter Belirleme Sayfası  
+![Image](https://github.com/user-attachments/assets/7c87268c-cbf4-4e23-9f27-06dda29b80a2)  
+
 ##
 
 

@@ -21,6 +21,7 @@
                         <th>Temel Alan</th>
                         <th>Kategori</th>
                         <th>Yayın Durumu</th>
+                        <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,13 @@
                             <td>@ilan.Kategori</td>
                             <td class="text-center">
                                 <span class="badge bg-success">YAYINDA</span>
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="IlanYayindanKaldir" asp-route-id="@ilan.IlanId" method="post" onsubmit="return confirm('İlanı yayından kaldırmak istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        🔻 Yayından Kaldır
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     }

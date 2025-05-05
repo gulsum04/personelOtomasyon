@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace personelOtomasyon.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Yonetici")]
     public class AdayController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,38 +19,59 @@ namespace personelOtomasyon.Controllers
             _userManager = userManager;
         }
 
-        // Başvuru Detay Sayfası
+        // Yayındaki ilanlar
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User); // Kullanıcı bilgilerini alıyoruz
-            var userId = user?.Id; // Kullanıcı ID'sini alıyoruz
+            var user = await _userManager.GetUserAsync(User);
+            var userId = user?.Id;
 
-            // Yayında olan ilanları alıyoruz
             var ilanlar = await _context.AkademikIlanlar
-                .Where(i => i.Yayinda) // Yayında olan ilanları filtreliyoruz
-                .Include(i => i.KadroKriterleri) // Kadro kriterlerini dahil ediyoruz
+                .Where(i => i.Yayinda)
+                .Include(i => i.KadroKriterleri)
                 .ToListAsync();
 
-            // Başvuru durumu ekliyoruz
             foreach (var ilan in ilanlar)
             {
                 var basvuru = await _context.Basvurular
                     .FirstOrDefaultAsync(b => b.IlanId == ilan.IlanId && b.KullaniciAdayId == userId);
 
-                // Başvuru yapılmışsa "Başvuruldu", yapılmamışsa "Başvurulmadı"
                 ViewData["BasvuruDurumu" + ilan.IlanId] = basvuru != null ? "Başvuruldu" : "Başvurulmadı";
             }
 
-            return View(ilanlar); // Veriyi view'a gönderiyoruz
+            return View(ilanlar);
         }
 
+        // İlan detay
+        public async Task<IActionResult> IlanDetay(int id)
+        {
+            var ilan = await _context.AkademikIlanlar
+                .Include(i => i.KadroKriterleri)
+                    .ThenInclude(k => k.AltBelgeTurleri)
+                .FirstOrDefaultAsync(i => i.IlanId == id);
 
+            if (ilan == null)
+                return NotFound();
 
+            var user = await _userManager.GetUserAsync(User);
+            bool basvurduMu = false;
+
+            if (user != null)
+            {
+                basvurduMu = await _context.Basvurular
+                    .AnyAsync(b => b.IlanId == id && b.KullaniciAdayId == user.Id);
+            }
+
+            ViewBag.BasvurduMu = basvurduMu;
+
+            return View(ilan);
+        }
+
+        // Başvuru yap sayfası
         public async Task<IActionResult> Basvur(int id)
         {
             var ilan = await _context.AkademikIlanlar
                 .Include(i => i.KadroKriterleri)
-                    .ThenInclude(k => k.AltBelgeTurleri) // ✅ Alt belge türleri de dahil ediliyor
+                    .ThenInclude(k => k.AltBelgeTurleri)
                 .FirstOrDefaultAsync(i => i.IlanId == id && i.Yayinda);
 
             var user = await _userManager.GetUserAsync(User);
@@ -64,12 +85,43 @@ namespace personelOtomasyon.Controllers
 
             return View(ilan);
         }
-        // Başvuru işlemi
+
+        // Başvuru yap post
         [HttpPost]
         public async Task<IActionResult> BasvuruYap(int ilanId, List<IFormFile> belgeler, List<string> belgeTurleri)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return RedirectToAction("Login", "Account");
+            if (user == null)
+                return RedirectToAction("Login", "Account");
+
+            var ilan = await _context.AkademikIlanlar
+                .Include(i => i.KadroKriterleri)
+                    .ThenInclude(k => k.AltBelgeTurleri)
+                .FirstOrDefaultAsync(i => i.IlanId == ilanId);
+
+            if (ilan == null)
+            {
+                TempData["Error"] = "İlan bulunamadı.";
+                return RedirectToAction("Index");
+            }
+
+            int toplamGerekliBelge = 0;
+            foreach (var kriter in ilan.KadroKriterleri)
+            {
+                if (kriter.BelgeYuklenecekMi || kriter.ZorunluMu)
+                {
+                    if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
+                        toplamGerekliBelge += kriter.AltBelgeTurleri.Sum(a => a.BelgeSayisi);
+                    else
+                        toplamGerekliBelge += 1;
+                }
+            }
+
+            if (belgeler.Count < toplamGerekliBelge)
+            {
+                TempData["Error"] = $"Eksik belge yüklemesi. Yüklemeniz gereken belge sayısı: {toplamGerekliBelge}.";
+                return RedirectToAction("Basvur", new { id = ilanId });
+            }
 
             var basvuru = new Basvuru
             {
@@ -89,13 +141,14 @@ namespace personelOtomasyon.Controllers
 
                 if (belge != null && belge.Length > 0)
                 {
-                    var dosyaAdi = Path.GetFileName(belge.FileName);
-                    var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
 
-                    if (!Directory.Exists(uploads))
-                        Directory.CreateDirectory(uploads);
+                    var fileName = Path.GetFileName(belge.FileName);
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    var filePath = Path.Combine(uploads, dosyaAdi);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await belge.CopyToAsync(stream);
@@ -105,40 +158,43 @@ namespace personelOtomasyon.Controllers
                     {
                         BasvuruId = basvuru.BasvuruId,
                         BelgeTuru = belgeTuru,
-                        DosyaYolu = "/uploads/" + dosyaAdi
+                        DosyaYolu = "/uploads/" + uniqueFileName
                     });
                 }
             }
 
             await _context.SaveChangesAsync();
-            TempData["Success"] = "Başvurunuz alındı.";
+            TempData["Success"] = "Başvurunuz başarıyla alınmıştır!";
             return RedirectToAction("Basvurularim");
         }
 
-
+        // Başvuru Detay - düzenlendi
         public async Task<IActionResult> BasvuruDetay(int id)
         {
             var basvuru = await _context.Basvurular
                 .Include(b => b.Ilan)
-                .ThenInclude(i => i.KadroKriterleri)
+                    .ThenInclude(i => i.KadroKriterleri)
                 .Include(b => b.Belgeler)
+                .Include(b => b.Aday) //OLMUYOR
+                .Include(b => b.DegerlendirmeRaporlari)
+                    .ThenInclude(r => r.Juri)
                 .FirstOrDefaultAsync(b => b.BasvuruId == id);
 
             if (basvuru == null)
             {
                 TempData["Error"] = "Başvuru bulunamadı.";
-                return RedirectToAction("Index"); // Geri yönlendirme
+                return RedirectToAction("Index");
             }
 
             return View(basvuru);
         }
 
 
-
-        // Adayın kendi başvurularını listelemesi
+        // Adayın yaptığı başvurular
         public async Task<IActionResult> Basvurularim()
         {
             var user = await _userManager.GetUserAsync(User);
+
             var basvurular = await _context.Basvurular
                 .Include(b => b.Ilan)
                 .Where(b => b.KullaniciAdayId == user.Id)
@@ -147,28 +203,24 @@ namespace personelOtomasyon.Controllers
             return View(basvurular);
         }
 
+        // Başvuru Sil
         public async Task<IActionResult> BasvuruSil(int id)
         {
-            // Başvuruyu veritabanından al
             var basvuru = await _context.Basvurular
                 .Include(b => b.Ilan)
                 .FirstOrDefaultAsync(b => b.BasvuruId == id);
 
-            // Başvuru bulunamazsa hata mesajı döndür
             if (basvuru == null)
             {
                 TempData["Error"] = "Başvuru bulunamadı.";
                 return RedirectToAction("Basvurularim");
             }
 
-            // Başvuruyu veritabanından sil
             _context.Basvurular.Remove(basvuru);
             await _context.SaveChangesAsync();
 
-            // Başarı mesajı ekle ve başvurularım sayfasına yönlendir
             TempData["Success"] = "Başvuru başarıyla silindi.";
-            return RedirectToAction("Basvurular");
-         }
-
+            return RedirectToAction("Basvurularim");
+        }
     }
-    }
+}

@@ -28,8 +28,18 @@
                     @ilan.BasvuruBaslangicTarihi.ToShortDateString() -
                     @ilan.BasvuruBitisTarihi.ToShortDateString()
                 </td>
+                <td class="text-center">
+                    @if (ilan.Yayinda)
+                    {
+                        <span class="badge bg-success">Yayında</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Yayında Değil</span>
+                    }
+                </td>
                 <td>
-                    <div class="d-flex flex-wrap gap-1">
+                    <div class="d-flex gap-1">
                         <a class="btn btn-sm btn-warning"
                            asp-action="Edit"
                            asp-route-id="@ilan.IlanId">
@@ -51,6 +61,17 @@
                     </div>
                 </td>
             </tr>
+
+            
         }
+       
+      
     </tbody>
+
 </table>
+
+<div class="text-end">
+    <a class="btn btn-secondary mt-3" asp-controller="Admin" asp-action="Dashboard">
+        ⬅ Geri Dön
+    </a>
+</div>

@@ -34,7 +34,7 @@
                 <td>@ilan.Baslik</td>
                 <td>@ilan.TemelAlan</td>
                 <td>@ilan.Kategori</td>
-                <td>
+                <td class="text-center">
                     @if (ilan.KadroKriterleri != null && ilan.KadroKriterleri.Any())
                     {
                         <span class="badge bg-info">Belirlendi</span>
@@ -44,7 +44,7 @@
                         <span class="badge bg-secondary">Belirlenmedi</span>
                     }
                 </td>
-                <td>
+                <td class="text-center">
                     @if (ilan.Yayinda)
                     {
                         <span class="badge bg-success">YAYINDA</span>
@@ -74,4 +74,8 @@
     </tbody>
 </table>
 
-<a class="btn btn-secondary" asp-action="Dashboard">🔙 Geri Dön</a>
+<div class="text-end mt-3">
+    <a class="btn btn-secondary" asp-action="Dashboard">
+        ⬅ Geri Dön
+    </a>
+</div>
