@@ -1,4 +1,4 @@
-﻿@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
+@model IEnumerable<personelOtomasyon.Models.AkademikIlan>
 
 @{
     ViewData["Title"] = "İlan Listesi";
@@ -15,7 +15,6 @@
             <th>Kategori</th>
             <th>Temel Alan</th>
             <th>Başvuru Tarihleri</th>
-            <th>Yayın Durumu</th>
             <th style="width: 220px;">İşlemler</th>
         </tr>
     </thead>
@@ -25,23 +24,12 @@
             <tr>
                 <td>@ilan.Baslik</td>
                 <td>@ilan.Kategori</td>
-                <td>@ilan.TemelAlan</td>
                 <td>
                     @ilan.BasvuruBaslangicTarihi.ToShortDateString() -
                     @ilan.BasvuruBitisTarihi.ToShortDateString()
                 </td>
                 <td>
-                    @if (ilan.Yayinda)
-                    {
-                        <span class="badge bg-success">Yayında</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Yayında Değil</span>
-                    }
-                </td>
-                <td>
-                    <div class="d-flex gap-1">
+                    <div class="d-flex flex-wrap gap-1">
                         <a class="btn btn-sm btn-warning"
                            asp-action="Edit"
                            asp-route-id="@ilan.IlanId">
@@ -51,14 +39,14 @@
                         <a class="btn btn-sm btn-danger"
                            asp-action="Delete"
                            asp-route-id="@ilan.IlanId">
-                            Sil
+                             Sil
                         </a>
 
                         <a class="btn btn-sm btn-outline-primary"
                            asp-controller="Admin"
                            asp-action="IlanaJuriAta"
                            asp-route-ilanId="@ilan.IlanId">
-                            Jüri Ata
+                           Jüri Ata
                         </a>
                     </div>
                 </td>

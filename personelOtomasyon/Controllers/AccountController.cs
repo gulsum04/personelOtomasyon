@@ -1,4 +1,4 @@
-﻿using KpsService;
+using KpsService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -143,9 +143,9 @@ namespace personelOtomasyon.Controllers
             }
 
             // ✅ KPS Web Servisi ile T.C. Kimlik Doğrulama
-            /* try
-             {
-                 var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
+            /*try
+            {
+                var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
 
                  // Ad ve Soyad'ı ayır
                  var ad = registerVM.FullName.Split(" ")[0].ToUpper();
@@ -158,47 +158,17 @@ namespace personelOtomasyon.Controllers
                      registerVM.DogumYili
                  );
 
-                 if (!kpsResult.Body.TCKimlikNoDogrulaResult)
-                 {
-                     TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
-                     return View(registerVM);
-                 }
-             }
-             catch (Exception ex)
-             {
-                 TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
-                 return View(registerVM);
-             }
-            */
-
-            //  Mock ile KPS doğrulama 
-
-            try
-            {
-                var ad = registerVM.FullName.Split(" ")[0].ToUpper();
-                var soyad = registerVM.FullName.Split(" ")[^1].ToUpper();
-
-                var dogrulandiMi = await _kpsService.TcKimlikDogrulaAsync(
-                    long.Parse(registerVM.TcKimlikNo),
-                    ad,
-                    soyad,
-                    registerVM.DogumYili
-                );
-
-                if (!dogrulandiMi)
+                if (!kpsResult.Body.TCKimlikNoDogrulaResult)
                 {
-                    TempData["Error"] = "T.C. Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
+                    TempData["Error"] = "TC Kimlik bilgileri doğrulanamadı. Lütfen tekrar kontrol edin.";
                     return View(registerVM);
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Kimlik doğrulama sırasında hata oluştu: " + ex.Message;
+                TempData["Error"] = "Kimlik doğrulama servisinde hata oluştu: " + ex.Message;
                 return View(registerVM);
-            }
-
-
-
+            }*/
 
             // ✅ Kullanıcıyı oluştur
             var newUser = new ApplicationUser
@@ -228,7 +198,7 @@ namespace personelOtomasyon.Controllers
         }
 
 
-        // ---------- LOGOUT ----------
+        // ---------- LOGOUT ---------
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

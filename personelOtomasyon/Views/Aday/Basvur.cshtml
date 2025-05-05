@@ -1,41 +1,24 @@
 ﻿@model personelOtomasyon.Models.AkademikIlan
 
-<h2>@Model.Baslik başvurusu</h2>
+<h2>@Model.Baslik</h2>
+<p><strong>Kategori:</strong> @Model.Kategori</p>
+<p><strong>Açıklama:</strong>@Model.Aciklama</p>
+<p><strong>Başvuru Tarihleri:</strong> @Model.BasvuruBaslangicTarihi.ToShortDateString() - @Model.BasvuruBitisTarihi.ToShortDateString()</p>
+
 <hr />
 
 <form asp-action="BasvuruYap" method="post" enctype="multipart/form-data">
     <input type="hidden" name="ilanId" value="@Model.IlanId" />
 
-    <table class="table table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th>Kriter</th>
-                <th>Açıklama</th>
-                <th>Belge Yükle</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.KadroKriterleri.Count(); i++)
-            {
-                var kriter = Model.KadroKriterleri.ElementAt(i);
-                <tr>
-                    <td>@kriter.KriterAdi</td>
-                    <td>@kriter.Aciklama</td>
-                    <td>
-                        @if (kriter.BelgeYuklenecekMi || kriter.ZorunluMu)
-                        {
-                            <input type="file" name="belgeler" class="form-control" required="@kriter.ZorunluMu" />
-                            <input type="hidden" name="belgeTurleri" value="@kriter.KriterAdi" />
-                        }
-                        else
-                        {
-                            <span class="text-muted">Belge gerekmiyor</span>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="form-group">
+        <label>Belge Adı</label>
+        <input type="text" name="belgeTuru" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Dosya Seç</label>
+        <input type="file" name="belge" class="form-control" required />
+    </div>
 
     <button type="submit" class="btn btn-primary">Başvuruyu Gönder</button>
 </form>

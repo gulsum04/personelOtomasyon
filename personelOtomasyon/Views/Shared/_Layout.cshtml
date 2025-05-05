@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using personelOtomasyon.Models
 @using personelOtomasyon.Data
 @inject ApplicationDbContext _context
@@ -68,12 +68,6 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Yonetici" asp-action="Dashboard">Yönetici Paneli</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Yonetici" asp-action="IlanListesi">Tüm İlanlar</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Yonetici" asp-action="YayinlananIlanlar">Yayındaki İlanlar</a>
-                                </li>
                             }
 
                             if (User.IsInRole("Juri"))
@@ -136,7 +130,7 @@
                         }
                         else
                         {
-                            <li class="nav-item">
+                            <li class="nav-item" >
                                 <a class="nav-link" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
                             </li>
                         }
@@ -162,5 +156,31 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @section Scripts {
+        <script src="~/js/site.js"></script>
+        <script>
+            function showToast(message) {
+                const toast = document.createElement("div");
+                toast.className = "toast align-items-center text-white bg-success border-0 show position-fixed bottom-0 end-0 m-4";
+                toast.setAttribute("role", "alert");
+                toast.setAttribute("aria-live", "assertive");
+                toast.setAttribute("aria-atomic", "true");
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.remove("show");
+                    toast.remove();
+                }, 4000);
+            }
+        </script>
+    }
+
 </body>
 </html>

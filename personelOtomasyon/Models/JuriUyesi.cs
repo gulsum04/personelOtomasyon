@@ -6,7 +6,7 @@ namespace personelOtomasyon.Models
     public class JuriUyesi
     {
         [Key]
-        public string JuriUyesiId { get; set; } = Guid.NewGuid().ToString(); // 🟢 Otomatik ID
+        public String JuriUyesiId { get; set; }
         public int IlanId { get; set; }
 
         [ForeignKey("IlanId")]

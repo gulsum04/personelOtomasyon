@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
@@ -57,7 +57,7 @@ namespace personelOtomasyon.Controllers
                 await _context.SaveChangesAsync();
 
                 // 🔔 Aday ve jüriye bildirim gönder
-                var hedefRoller = new[] { "Juri" };
+                var hedefRoller = new[] { "User", "Juri" };
                 foreach (var rol in hedefRoller)
                 {
                     var users = await _userManager.GetUsersInRoleAsync(rol);

@@ -53,16 +53,17 @@ namespace personelOtomasyon.Controllers
                     .ThenInclude(k => k.AltBelgeTurleri) // ✅ Alt belge türleri de dahil ediliyor
                 .FirstOrDefaultAsync(i => i.IlanId == id && i.Yayinda);
 
-            if (ilan == null || ilan.KadroKriterleri == null || !ilan.KadroKriterleri.Any())
+            var user = await _userManager.GetUserAsync(User);
+            var dahaOnceBasvurmusMu = await _context.Basvurular.AnyAsync(b => b.IlanId == id && b.KullaniciAdayId == user.Id);
+
+            if (dahaOnceBasvurmusMu)
             {
-                TempData["Error"] = "Bu ilana başvuru yapılamaz.";
+                TempData["Uyari"] = "❗ Bu ilana zaten başvurdunuz.";
                 return RedirectToAction("Index");
             }
 
             return View(ilan);
         }
-
-
         // Başvuru işlemi
         [HttpPost]
         public async Task<IActionResult> BasvuruYap(int ilanId, List<IFormFile> belgeler, List<string> belgeTurleri)

@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Jüri Atama";
     var ilan = ViewBag.Ilan as personelOtomasyon.Models.AkademikIlan;
     var atanabilecekJuriListesi = ViewBag.AtanabilecekJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
@@ -93,22 +93,24 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            // Uyarı varsa kaldır
+                            // Uyarı mesajı varsa kaldır
                             $("#atanmis-juri-listesi .text-warning").remove();
 
                             response.atananlar.forEach(juri => {
-                                $("#juri-" + juri.id).remove();
+                                // Atanmış listeye ekle
                                 $("#atanmis-juri-listesi").append(`
                                     <li class="list-group-item d-flex justify-content-between align-items-center" id="atanan-juri-${juri.id}">
                                         <span>${juri.adSoyad}</span>
                                         <button class="btn btn-sm btn-danger sil-button" data-id="${juri.id}" data-ilan-id="${ilanId}">Sil</button>
                                     </li>`);
+                                // Atanabilir listeden kaldır
+                                $("#juri-" + juri.id).remove();
                             });
 
                             baglaSilmeButonlari();
                             $("input[name='seciliJuriIdler']").prop("checked", false);
 
-                            // Atanabilir liste boşsa uyarı ver
+                            // Eğer atanabilir listede kimse kalmadıysa uyarı ver
                             if ($("#atanabilir-juri-listesi .form-check").length === 0) {
                                 $("#atanabilir-juri-listesi").html(`<div class="alert alert-info">Bu ilana atanabilecek jüri kalmadı.</div>`);
                             }
@@ -136,11 +138,11 @@
                     data: { juriId: juriId, ilanId: ilanId },
                     success: function (response) {
                         if (response.success) {
+                            // Listeden kaldır
                             $("#atanan-juri-" + juriId).remove();
 
-                            // Uyarı varsa kaldır
-                            $("#atanabilir-juri-listesi .alert").remove();
-
+                            // Atanabilir listesine geri ekle
+                            $("#atanabilir-juri-listesi .alert").remove(); // info mesajı varsa sil
                             $("#atanabilir-juri-listesi").append(`
                                 <div class="form-check" id="juri-${juriId}">
                                     <input class="form-check-input" type="checkbox" name="seciliJuriIdler" value="${juriId}" id="input-juri-${juriId}" />
@@ -149,9 +151,11 @@
 
                             baglaSilmeButonlari();
 
+                            // Eğer atanmış jüri listesi boş kaldıysa uyarı ver
                             if ($("#atanmis-juri-listesi li").length === 0) {
                                 $("#atanmis-juri-listesi").html(`
-                                    <li class="list-group-item text-center text-warning">Bu ilana henüz jüri atanmadı.</li>`);
+                                    <li class="list-group-item text-center text-warning">Bu ilana henüz jüri atanmadı.</li>
+                                `);
                             }
                         } else {
                             alert("Silme başarısız.");

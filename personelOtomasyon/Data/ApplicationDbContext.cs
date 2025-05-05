@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using personelOtomasyon.Models;
 
@@ -16,7 +16,6 @@ namespace personelOtomasyon.Data
         public DbSet<KadroKriteri> KadroKriterleri { get; set; }
         public DbSet<BasvuruJuri> BasvuruJuriAtamalari { get; set; }
         public DbSet<Bildirim> Bildirimler { get; set; }
-        public DbSet<KadroKriterAlt> KadroKriterAltlar { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,14 +61,6 @@ namespace personelOtomasyon.Data
      .WithMany(i => i.Basvurular) // ❗ burası çok önemli
      .HasForeignKey(b => b.IlanId)
      .OnDelete(DeleteBehavior.Cascade);
-
-            // İlan - KadroKriteri ilişkisi
-            modelBuilder.Entity<KadroKriteri>()
-                .HasOne(k => k.Ilan)
-                .WithMany(i => i.KadroKriterleri)
-                .HasForeignKey(k => k.IlanId)
-                .OnDelete(DeleteBehavior.Cascade); // İlan silinirse kriterleri de silinsin
-
 
         }
     }

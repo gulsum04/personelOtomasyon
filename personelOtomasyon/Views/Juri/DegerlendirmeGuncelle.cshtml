@@ -14,13 +14,13 @@
     <input type="hidden" asp-for="BasvuruId" />
 
     <div class="form-group">
-        @if (TempData["Uyari"] != null)
-        {
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                @TempData["Uyari"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-            </div>
-        }
+           @if (TempData["Uyari"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Uyari"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    </div>
+}
 
         <label asp-for="Sonuc">Sonuç</label>
         <select asp-for="Sonuc" class="form-control">

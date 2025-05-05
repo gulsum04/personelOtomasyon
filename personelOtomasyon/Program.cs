@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using personelOtomasyon.Data;
 using Microsoft.AspNetCore.Identity;
 using personelOtomasyon.Models;
@@ -24,24 +24,10 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-
 //  ROL EKLEME BLOĞU (Admin ve User rolleri oluşturulur)
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    Task.Run(async () =>
-    {
-        string[] roleNames = { "Admin", "User", "Yonetici", "Juri" };
-
-        foreach (var role in roleNames)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
-    }).GetAwaiter().GetResult();
+    await SeedData.InitializeAsync(scope.ServiceProvider);
 }
 
 // Hata yönetimi

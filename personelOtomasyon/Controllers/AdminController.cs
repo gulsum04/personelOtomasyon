@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -120,12 +120,7 @@ namespace personelOtomasyon.Controllers
             {
                 if (!_context.JuriUyeleri.Any(j => j.IlanId == ilanId && j.KullaniciJuriId == juriId))
                 {
-                    _context.JuriUyeleri.Add(new JuriUyesi
-                    {
-                        JuriUyesiId = Guid.NewGuid().ToString(), // 🔑 BU SATIR ZORUNLU
-                        IlanId = ilanId,
-                        KullaniciJuriId = juriId
-                    });
+                    _context.JuriUyeleri.Add(new JuriUyesi { IlanId = ilanId, KullaniciJuriId = juriId });
 
                     var user = _context.Users.FirstOrDefault(u => u.Id == juriId);
                     if (user != null)

@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Başvuruya Jüri Atama";
     var basvuru = ViewBag.Basvuru as personelOtomasyon.Models.Basvuru;
     var atanabilirJuriListesi = ViewBag.AtanabilirJuriListesi as List<personelOtomasyon.Models.ApplicationUser>;
@@ -99,7 +99,7 @@ else
 
                         // Tüm atanabilirler bittiyse uyarı göster
                         if ($("#atanabilir-juri-listesi .form-check").length === 0) {
-                            $("#atanabilir-juri-listesi").html(`<div class="alert alert-info">Bu başvuruya yönlendirilebilecek jüri kalmadı.</div>`);
+                            $("#atanabilir-juri-listesi").html(`<div class="alert alert-info">Bu ilana atanmış ama bu başvuruya yönlendirilebilecek jüri kalmadı.</div>`);
                         }
                     } else {
                         alert("Atama başarısız.");
