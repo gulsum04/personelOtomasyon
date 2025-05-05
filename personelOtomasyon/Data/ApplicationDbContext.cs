@@ -46,9 +46,9 @@ namespace personelOtomasyon.Data
       .HasOne(bj => bj.Basvuru)
       .WithMany()
       .HasForeignKey(bj => bj.BasvuruId)
-      .OnDelete(DeleteBehavior.Cascade); // 👈 BU ÖNEMLİ
+      .OnDelete(DeleteBehavior.Cascade); 
 
-            // ❗ Başvuru - Belge İlişkisi Cascade yapılmalı
+            
             modelBuilder.Entity<BasvuruBelge>()
                 .HasOne(bb => bb.Basvuru)
                 .WithMany(b => b.Belgeler)
@@ -64,7 +64,7 @@ namespace personelOtomasyon.Data
             // İlan - Başvuru ilişkisi: ❗ İlan silinirse başvurular da silinsin
             modelBuilder.Entity<Basvuru>()
      .HasOne(b => b.Ilan)
-     .WithMany(i => i.Basvurular) // ❗ burası çok önemli
+     .WithMany(i => i.Basvurular) 
      .HasForeignKey(b => b.IlanId)
      .OnDelete(DeleteBehavior.Cascade);
 

@@ -59,7 +59,6 @@
                                 <p><strong>Açıklama:</strong> @(string.IsNullOrEmpty(kriter.Aciklama) ? "Açıklama belirtilmedi." : kriter.Aciklama)</p>
                                 <p><strong>Zorunlu mu?:</strong> @(kriter.ZorunluMu ? "Evet" : "Hayır")</p>
                                 <p><strong>Belge Yüklenecek mi?:</strong> @(kriter.BelgeYuklenecekMi ? "Evet" : "Hayır")</p>
-                                <p><strong>İstenen Toplam Belge Sayısı:</strong> @kriter.BelgeSayisi</p>
 
                                 @if (kriter.AltBelgeTurleri != null && kriter.AltBelgeTurleri.Any())
                                 {
